@@ -11,13 +11,30 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-
+from celery.schedules import crontab
 from dotenv import load_dotenv
 load_dotenv()
 
+REDIS_URL = f'redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}'
+
+# Celery variables
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Sao_Paulo'
+# Periodic Tasks
+CELERY_BEAT_SCHEDULE = {
+    'say-hello': {
+        'task': 'board.tasks.hello',
+        'schedule': crontab(),
+    },
+}
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -26,7 +43,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('DJANGO_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(os.getenv('DJANGO_DEBUG', 1))
 
 ALLOWED_HOSTS = ['*']
 
@@ -41,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'board.apps.BoardConfig',
 ]
 
 MIDDLEWARE = [
