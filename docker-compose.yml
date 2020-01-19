@@ -1,0 +1,38 @@
+version: "3"
+
+services: 
+  postgres:
+    image: postgres:12-alpine
+    restart: always
+    env_file: ./.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  redis:
+    image: redis:alpine
+  django:
+    build: ./cloudroom
+    volumes: 
+      - ./cloudroom:/home/app
+    env_file: ./.env
+    restart: always
+    command: >
+      sh -c "
+        python manage.py migrate && \
+        python manage.py runserver 0.0.0.0:8000"
+    ports: 
+      - 8000:8000
+    depends_on: 
+      - postgres
+      - redis
+  celery:
+    build: ./cloudroom
+    volumes: 
+      - ./cloudroom:/home/app
+    env_file: ./.env
+    restart: always
+    command: celery -A cloudroom worker -l info -B
+    depends_on: 
+      - postgres
+      - redis
+volumes: 
+  postgres_data:
