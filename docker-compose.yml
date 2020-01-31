@@ -7,6 +7,8 @@ services:
     env_file: ./.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
   redis:
     image: redis:alpine
   django:
@@ -24,13 +26,23 @@ services:
     depends_on: 
       - postgres
       - redis
-  celery:
+  celery_worker:
     build: ./cloudroom
     volumes: 
       - ./cloudroom:/home/app
     env_file: ./.env
     restart: always
-    command: celery -A cloudroom worker -l info -B
+    command: [celery, -A, cloudroom, worker, -l, info]
+    depends_on: 
+      - postgres
+      - redis
+  celery_beat:
+    build: ./cloudroom
+    volumes: 
+      - ./cloudroom:/home/app
+    env_file: ./.env
+    restart: always
+    command: [celery, -A, cloudroom, beat, -l, info]
     depends_on: 
       - postgres
       - redis

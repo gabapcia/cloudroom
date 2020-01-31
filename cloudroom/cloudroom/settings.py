@@ -37,8 +37,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET', 'secret')
+# SECURITY WARNING: keep the secret key used in production secret! 
+SECRET_KEY = os.getenv('DJANGO_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.getenv('DJANGO_DEBUG', 1))
@@ -90,16 +90,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'cloudroom.wsgi.application'
 
 
+# Djando REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+}
+
+
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('POSTGRES_DB', 'cloudroom'),
-        'USER': os.getenv('POSTGRES_USER', 'cloudroom'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'cloudpass'),
-        'HOST': os.getenv('POSTGRES_HOST', 'localhost')
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),
     }
 }
 

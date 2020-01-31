@@ -1,6 +1,6 @@
-django
-djangorestframework
-celery
-redis
-psycopg2-binary
+django==3.0.2
+djangorestframework==3.11.0
+celery==4.4.0
+redis==3.3.11
+psycopg2-binary==2.8.4
 ipython
