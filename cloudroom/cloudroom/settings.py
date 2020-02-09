@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from celery.schedules import crontab
 
+from dotenv import load_dotenv
+load_dotenv()
+
 REDIS_URL = f'redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}'
 
 # Celery variables
@@ -26,6 +29,10 @@ CELERY_TIMEZONE = 'America/Sao_Paulo'
 CELERY_BEAT_SCHEDULE = {
     'say-hello': {
         'task': 'board.tasks.hello',
+        'schedule': crontab(),
+    },
+    'track-orders': {
+        'task': 'orders.tasks.manage_deliveries',
         'schedule': crontab(),
     },
 }
@@ -57,6 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'board.apps.BoardConfig',
+    'orders.apps.OrdersConfig',
 ]
 
 MIDDLEWARE = [
@@ -92,7 +100,8 @@ WSGI_APPLICATION = 'cloudroom.wsgi.application'
 
 # Djando REST Framework
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20
 }
 
 
@@ -106,6 +115,7 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('POSTGRES_HOST'),
+        'PORT': os.getenv('POSTGRES_PORT'),
     }
 }
 
