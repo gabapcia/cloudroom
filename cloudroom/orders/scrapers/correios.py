@@ -1,10 +1,11 @@
-import requests, datetime, os
+import requests, datetime, os, re
 from bs4 import BeautifulSoup
+from orders.scrapers.util import exceptions
 
 
 TRACK_URL = 'https://www2.correios.com.br/sistemas/rastreamento/ctrl/ctrlRastreamento.cfm?'
 BASE_URL = 'https://apps.correios.com.br'
-LOGIN_URL = '/portalimportador'
+LOGIN_ENDPOINT = '/portalimportador'
 
 
 def _parse_info(resp):
@@ -40,18 +41,25 @@ def _parse_info(resp):
 
 
 def delivery_info(code : str):
+    if len(code) != 13:
+        raise exceptions.InvalidTrackingCode
+
     s = requests.Session()
     resp = s.post(TRACK_URL, data={
         'acao': 'track',
         'objetos': code,
         'btnPesq': 'Buscar',
     })
+    
+    if 'Aguardando postagem pelo remetente' in resp.text:
+        raise exceptions.OrderNotShipped
+    
     result, need_cpf = _parse_info(resp)
     return result, need_cpf
 
 
 def _do_login(s):
-    resp = s.get(BASE_URL + LOGIN_URL)
+    resp = s.get(BASE_URL + LOGIN_ENDPOINT)
     link = BeautifulSoup(resp.content, 'lxml')\
         .find('head').find('meta', attrs={'http-equiv': 'Refresh'})['content'][len('0;url='):]
     resp = s.get(BASE_URL + link)
@@ -89,6 +97,9 @@ def _find_item(s, resp, code):
 
 
 def register_cpf(code : str):
+    if len(code) != 13:
+        raise exceptions.InvalidTrackingCode
+    
     s = requests.Session()
     resp = _do_login(s)
     resp = _find_item(s, resp, code)
@@ -96,4 +107,5 @@ def register_cpf(code : str):
     
 
 if __name__ == '__main__':
-    register_cpf('LB660522014SE')
+    # register_cpf('LB052457405SG')
+    delivery_info('LB052457405SG')

@@ -7,7 +7,7 @@ class CorreiosViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.CorreiosSerializer
 
 
-class CorreiosInfoViewSet(viewsets.ReadOnlyModelViewSet):
+class CorreiosInfoViewSet(viewsets.ModelViewSet):
     queryset = models.CorreiosInfo.objects.order_by('-id')
     serializer_class = serializers.CorreiosInfoSerializer
 
