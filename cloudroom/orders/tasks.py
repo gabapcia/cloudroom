@@ -21,7 +21,9 @@ def manage_deliveries():
             order.delete()
 
         results[order.code] = result
-        # TODO: Handle CPF registration
+
+        if need_cpf:
+            pass # TODO: Handle CPF registration
 
     for track_number, infos in results.items():
         order = pending_orders.get(code=track_number)
@@ -49,10 +51,18 @@ def manage_deliveries():
                 )
 
 
-@task(autoretry_for=(exceptions.MailError,), retry_backoff=True)
+@task(
+    autoretry_for=(exceptions.MailError,), 
+    retry_backoff=True,
+    retry_backoff_max=300,
+    max_retries=None
+)
 def send_email(track_number:str, order_name:str, status:str, description:str):
     mail.send_message(
         subject=f'Your {order_name} delivery status has been updated!',
-        template=(f'Gabriel, your order "{track_number} - {order_name}" status has ' + \
-            f'been updated to "{status}"<br>Decription: {description}.')
+        template=f'''
+Hello, Gabriel. 
+Your order "{track_number} - {order_name}" status has been updated to "{status}"
+Decription: {description}.        
+        '''
     )

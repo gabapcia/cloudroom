@@ -1,9 +1,9 @@
 FROM python:3.8-alpine
 
-WORKDIR /home/app
+WORKDIR /usr/app
 
 RUN apk update
-RUN apk add postgresql-dev g++ libxslt-dev
+RUN apk add postgresql-dev g++ py3-lxml
 
 COPY ./requirements.txt .
 

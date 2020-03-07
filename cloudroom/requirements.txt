@@ -1,11 +1,12 @@
-django==3.0.2
-djangorestframework==3.11.0
-celery==4.4.0
-redis==3.3.11
-psycopg2-binary==2.8.4
-ipython
-requests==2.22.0
-beautifulsoup4==4.8.2
-lxml==4.5.0
+django
+djangorestframework
+psycopg2-binary
+celery
+redis
+requests
+beautifulsoup4
+sendgrid
+
+# Optional
 python-dotenv
-sendgrid==6.1.1
+ipython
