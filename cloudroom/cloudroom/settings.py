@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from celery.schedules import crontab
 
-from dotenv import load_dotenv
-load_dotenv()
 
 REDIS_URL = f'redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}'
 
@@ -27,7 +25,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'America/Sao_Paulo'
 # Periodic Tasks
 CELERY_BEAT_SCHEDULE = {
-    'track orders': {
+    'Track orders': {
         'task': 'orders.tasks.manage_deliveries',
         'schedule': crontab(),
     },
@@ -44,7 +42,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('DJANGO_SECRET')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.getenv('DJANGO_DEBUG', 1))
+DEBUG = int(os.getenv('DJANGO_DEBUG'))
 
 ALLOWED_HOSTS = ['*']
 
@@ -94,10 +92,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'cloudroom.wsgi.application'
 
 
-# Djando REST Framework
+# Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20
+    'PAGE_SIZE': 20,
 }
 
 

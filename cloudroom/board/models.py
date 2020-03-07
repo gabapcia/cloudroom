@@ -28,12 +28,17 @@ class Pin(models.Model):
     ))
     description = models.TextField(max_length=256, null=True, blank=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['number', 'board'], 
+                name='pin_constraint'
+            )
+        ]
+
     def save(self, *args, **kwargs):
         Validator.status_validation(self.status, self.configuration)
         super().save(*args, **kwargs)
-    
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['number', 'board'], name='pin_constraint')
-        ]
 
+    def __str__(self):
+        return f'Pin #{self.number} - {self.board.name}'

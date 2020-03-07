@@ -26,9 +26,7 @@ def _parse_info(resp):
         
         parsed.append({
             'Date': datetime.datetime.strptime(
-                ' '.join(
-                    i[0].text.strip().split()[:2]
-                ),
+                ' '.join(i[0].text.strip().split()[:2]),
                 '%d/%m/%Y %H:%M'
             ),
             'Place': ''.join(i[0].text.strip().split()[2:]),
