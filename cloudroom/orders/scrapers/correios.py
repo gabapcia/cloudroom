@@ -19,7 +19,8 @@ def _parse_info(resp):
 
     for i in items:
         description = ' '.join(i[1].text.strip().split())
-        if (index := description.find('Informar nº do documento para a fiscalização')) != -1:
+        index = description.find('Informar nº do documento para a fiscalização')
+        if index != -1:
             description = description[:index].strip()
             need_cpf = True
         
@@ -67,7 +68,7 @@ def _do_login(s):
     
     soup = BeautifulSoup(resp.content, 'lxml').find('form')
     form_data = {
-        'username': os.getenv('CORREIOS_USER'),
+        'username': os.getenv('MY_EMAIL'),
         'password': os.getenv('CORREIOS_PASS'),
         'lt': soup.find('input', attrs={'name': 'lt'})['value'],
         'execution': soup.find('input', attrs={'name': 'execution'})['value'],
@@ -79,22 +80,30 @@ def _do_login(s):
 
 
 def _find_item(s, resp, code):
-    soup = BeautifulSoup(resp.content, 'lxml').find('div', class_='content').find('form')
+    soup = BeautifulSoup(resp.content, 'lxml')\
+        .find('div', class_='content').find('form')
     form_data = {
         'form-pesquisarRemessas': 'form-pesquisarRemessas',
         'form-pesquisarRemessas:codigoEncomenda': code,
         'form-pesquisarRemessas:j_idt65:j_idt77': '1',
         'form-pesquisarRemessas:j_idt115:j_idt127': '1',
-        'javax.faces.ViewState': soup.find('input', id='javax.faces.ViewState')['value'],
+        'javax.faces.ViewState': \
+            soup.find('input', id='javax.faces.ViewState')['value'],
         'javax.faces.source': 'form-pesquisarRemessas:btnPesquisar',
         'javax.faces.partial.event': 'click',
-        'javax.faces.partial.execute': 'form-pesquisarRemessas:btnPesquisar form-pesquisarRemessas',
+        'javax.faces.partial.execute': \
+            'form-pesquisarRemessas:btnPesquisar form-pesquisarRemessas',
         'javax.faces.partial.render': 'form-pesquisarRemessas',
         'javax.faces.behavior.event': 'action',
         'javax.faces.partial.ajax': 'true',
     }
     link = soup['action']
-    return s.post(BASE_URL + link, data=form_data)
+    resp = s.post(BASE_URL + link, data=form_data)
+    
+    if 'Nenhum registro encontrado.' in resp.text:
+        raise exceptions.OrderNotFound
+    
+    return resp
 
 
 def register_cpf(code : str):
@@ -108,5 +117,5 @@ def register_cpf(code : str):
     
 
 if __name__ == '__main__':
-    # register_cpf('LB052457405SG')
-    delivery_info('LB052457405SG')
+    register_cpf('LB332085924SE')
+    # delivery_info('LB332085924SE')
