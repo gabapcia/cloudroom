@@ -19,6 +19,8 @@ def manage_deliveries():
             result, need_cpf = correios.delivery_info(code=order.code)
         except request_exceptions.InvalidTrackingCode:
             order.delete()
+        except request_exceptions.OrderNotShipped:
+            continue
 
         results[order.code] = result
 

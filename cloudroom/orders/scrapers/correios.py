@@ -61,7 +61,8 @@ def delivery_info(code : str):
 def _do_login(s):
     resp = s.get(BASE_URL + LOGIN_ENDPOINT)
     link = BeautifulSoup(resp.content, 'lxml')\
-        .find('head').find('meta', attrs={'http-equiv': 'Refresh'})['content'][len('0;url='):]
+        .find('head').find('meta', attrs={'http-equiv': 'Refresh'})\
+            ['content'][len('0;url='):]
     resp = s.get(BASE_URL + link)
     
     soup = BeautifulSoup(resp.content, 'lxml').find('form')
