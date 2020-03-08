@@ -3,10 +3,17 @@ from board import models
 
 
 class BoardSerializer(serializers.HyperlinkedModelSerializer):
-    pin_set = serializers.HyperlinkedRelatedField(
+    pins = serializers.HyperlinkedRelatedField(
         many=True,
         read_only=True,
-        view_name='pin-detail'
+        view_name='pin-detail',
+        source='pin_set',
+    )
+    last_request = serializers.ReadOnlyField()
+    allowed = serializers.ReadOnlyField()
+    password = serializers.CharField(
+        write_only=True, 
+        style={'input_type': 'password'}
     )
 
     class Meta:

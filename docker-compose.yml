@@ -36,7 +36,7 @@ services:
       - ./cloudroom:/usr/app
     env_file: ./cloudroom/.env
     restart: always
-    command: [celery, -A, cloudroom, worker, -l, info]
+    command: [celery, -A, cloudroom, worker, -l, ERROR]
     depends_on: 
       - postgres
       - redis
@@ -46,7 +46,7 @@ services:
       - ./cloudroom:/usr/app
     env_file: ./cloudroom/.env
     restart: always
-    command: [celery, -A, cloudroom, beat, -l, info]
+    command: [celery, -A, cloudroom, beat, -l, ERROR]
     depends_on: 
       - postgres
       - redis

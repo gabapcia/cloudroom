@@ -1,11 +1,14 @@
 django
 djangorestframework
+django-cors-headers
 psycopg2-binary
 celery
 redis
 requests
 beautifulsoup4
 sendgrid
+argon2-cffi
+pyjwt
 
 # Optional
 python-dotenv
