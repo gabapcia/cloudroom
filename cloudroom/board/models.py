@@ -25,7 +25,7 @@ class Board(models.Model):
 
 
 class Pin(models.Model):
-    board = models.ForeignKey('Board', on_delete=models.CASCADE, editable=False)
+    board = models.ForeignKey('Board', on_delete=models.CASCADE)
     number = models.PositiveIntegerField(db_index=True)
     status = models.CharField(max_length=4)
     mode = models.BooleanField(default=False, choices=(

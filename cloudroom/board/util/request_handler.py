@@ -1,27 +1,25 @@
-import argon2, jwt, os, datetime
+import argon2, os, datetime, base64, re
 from rest_framework import status, response
 from django.core.exceptions import ObjectDoesNotExist
 from board import models, serializers
+from board.util import exceptions
 
 
-def validate_board(body:dict) -> response.Response:
-    if 'id' not in body and \
-        'password' not in body:
-        return response.Response(
-            data={'detail': 'Auth data not provied'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+def validate_board(header:str) -> models.Board:
+    auth = base64.b64decode(header.encode()).decode()
+    board_id, password = auth.split(':') 
+    
     ph = argon2.PasswordHasher()
     try:
-        board = models.Board.objects.get(pk=body['id'])
-        ph.verify(board.password, body['password'])
+        board = models.Board.objects.get(pk=board_id)
+        ph.verify(board.password, password)
     except ObjectDoesNotExist:
-        return response.Response(
+        raise exceptions.BoardAuthError(
             data={'detail': 'Board does not exist'},
             status=status.HTTP_400_BAD_REQUEST
         )
     except argon2.exceptions.VerifyMismatchError:
-        return response.Response(
+        raise exceptions.BoardAuthError(
             data={'detail': 'Invalid password'},
             status=status.HTTP_401_UNAUTHORIZED
         )
@@ -31,44 +29,51 @@ def validate_board(body:dict) -> response.Response:
         board.save()
     
     if not board.allowed:
-        return response.Response(
+        raise exceptions.BoardAuthError(
             data={'detail': 'This board is actually suspended'},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
-    token = jwt.encode(
-        payload={
-            'id': board.id,
-            'exp': datetime.datetime.now() + datetime.timedelta(days=1),
-        },
-        key=os.getenv('JWT_SECRET'),
-    ).decode()
-
-    return response.Response(
-        data={'token': token},
-        status=status.HTTP_201_CREATED,
-    )
-
-
-def board_pin_list(token:str) -> response.Response:
-    try:
-        board_id = jwt.decode(
-            jwt=token, 
-            key=os.getenv('JWT_SECRET'),
-        )['id']
-    except jwt.ExpiredSignatureError:
-        return response.Response(
-            data={'detail': 'Token has expired'},
-            status=status.HTTP_401_UNAUTHORIZED,
+            status=status.HTTP_401_UNAUTHORIZED
         )
     
-    board = models.Board.objects.get(pk=board_id)
+    return board
+
+
+def board_pin_list(request) -> response.Response:
+    if 'Board-Token' not in request.headers:
+        return response.Response(
+            data={'detail': 'Authentication credentials were not provided'},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
+    if not re.search(r'^Basic ', request.headers['Board-Token']):
+        return response.Response(
+            data={'detail': 'Token malformatted'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    token = request.headers['Board-Token'].split(' ')[1]
+    try:
+        board = validate_board(
+            header=token
+        )
+    except exceptions.BoardAuthError as e:
+        return response.Response(
+            data=e.data,
+            status=e.status,
+        )
+    
     board.last_request = datetime.datetime.now()
     board.save()
 
     pins = serializers.PinSerializer(
         board.pin_set,
-        many=True
+        many=True,
+        fields=(
+            'number',
+            'status',
+            'mode',
+            'configuration'
+        )
     )
 
-    return response.Response(data=pins.data, status=status.HTTP_200_OK)
+    return response.Response(
+        data=pins.data, 
+        status=status.HTTP_200_OK
+    )
