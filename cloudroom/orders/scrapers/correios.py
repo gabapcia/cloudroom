@@ -1,7 +1,10 @@
 import requests, datetime, os, re
 from bs4 import BeautifulSoup
-from orders.scrapers.util import exceptions
+# from orders.scrapers.util import exceptions
+from util import exceptions
 
+import dotenv
+dotenv.load_dotenv()
 
 TRACK_URL = 'https://www2.correios.com.br/sistemas/rastreamento/ctrl/ctrlRastreamento.cfm?'
 BASE_URL = 'https://apps.correios.com.br'
@@ -101,6 +104,27 @@ def _find_item(s, resp, code):
     if 'Nenhum registro encontrado.' in resp.text:
         raise exceptions.OrderNotFound
     
+    link = resp.text.split('<redirect url="')[-1].split('"></redirect>')[0]
+
+    if '</div>' in link:
+        raise exceptions.DocumentAlreadyRegistered
+
+    return s.get(BASE_URL + link)
+
+
+def _register_cpf(s, resp):
+    soup = BeautifulSoup(resp.content).find('form', id='form-autodeclaracao')
+    form_data = {
+        'form-autodeclaracao': 'form-autodeclaracao',
+        'form-autodeclaracao:tipoDocumentoImportador': '1',
+        'form-autodeclaracao:numDocumentoImportador': os.getenv('MY_CPF'),
+        'form-autodeclaracao:btnSalvar': 'Salvar',
+        'javax.faces.ViewState': soup.find(
+            'input', id='javax.faces.ViewState'
+        )['value'],
+    }
+    resp = s.post(BASE_URL + soup['action'], data=form_data)
+
     return resp
 
 
@@ -111,7 +135,7 @@ def register_cpf(code : str):
     s = requests.Session()
     resp = _do_login(s)
     resp = _find_item(s, resp, code)
-    # TODO: Continue automatization when get information about untracked items
+    resp = _register_cpf(s, resp)
     
 
 if __name__ == '__main__':
