@@ -129,13 +129,10 @@ def _register_cpf(s, resp):
 
 
 def register_cpf(code : str):
-    if len(code) != 13:
-        raise exceptions.InvalidTrackingCode
-    
     s = requests.Session()
     resp = _do_login(s)
     resp = _find_item(s, resp, code)
-    resp = _register_cpf(s, resp)
+    _register_cpf(s, resp)
     
 
 if __name__ == '__main__':

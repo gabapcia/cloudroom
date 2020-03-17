@@ -12,26 +12,29 @@ def manage_deliveries():
     if not pending_orders:
         return
     
-    results = {}
-
     for order in pending_orders.iterator():
         try:
             result, need_cpf = correios.delivery_info(code=order.code)
         except request_exceptions.InvalidTrackingCode:
             order.delete()
+            continue
         except request_exceptions.OrderNotShipped:
             continue
 
-        results[order.code] = result
+        if need_cpf and not order.cpf_registered:
+            try:
+                correios.register_cpf(order.code)
+                order.cpf_registered = True
+                order.save()
+            except request_exceptions.DocumentAlreadyRegistered:
+                order.cpf_registered = True
+                order.save()
+            except request_exceptions.OrderNotFound:
+                pass
 
-        if need_cpf:
-            pass # TODO: Handle CPF registration
-
-    for track_number, infos in results.items():
-        order = pending_orders.get(code=track_number)
-        order.last_update = infos[-1]['Date']
+        order.last_update = result[-1]['Date']
         order.save()
-        for info in infos:
+        for info in result:
             _, is_created = models.CorreiosInfo.objects.get_or_create(
                 order=order,
                 date=info['Date'],
@@ -44,9 +47,9 @@ def manage_deliveries():
                 order.delivered = True
                 order.save()
 
-            if info == infos[-1] and is_created:
+            if info == result[-1] and is_created:
                 send_email.delay(
-                    track_number=track_number,
+                    track_number=order.code,
                     order_name=order.name,
                     status=info['Info']['Status'],
                     description=info['Info']['Description']
