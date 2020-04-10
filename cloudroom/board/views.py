@@ -23,3 +23,7 @@ class PinViewSet(viewsets.ModelViewSet):
         return request_handler.board_pin_list(
             request=request
         )
+
+class PeriodicPinViewSet(viewsets.ModelViewSet):
+    queryset = models.PeriodicPin.objects.all().order_by('-id')
+    serializer_class = serializers.PeriodicPinSerializer

@@ -27,7 +27,7 @@ CELERY_TIMEZONE = 'America/Sao_Paulo'
 CELERY_BEAT_SCHEDULE = {
     'Track orders': {
         'task': 'orders.tasks.manage_deliveries',
-        'schedule': crontab(),
+        'schedule': crontab(minute='*/5'),
     },
 }
 
@@ -148,7 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from board import models
+from board.util import model_validators
 
 
 class BoardSerializer(serializers.HyperlinkedModelSerializer):
@@ -9,8 +10,6 @@ class BoardSerializer(serializers.HyperlinkedModelSerializer):
         view_name='pin-detail',
         source='pin_set',
     )
-    last_request = serializers.ReadOnlyField()
-    allowed = serializers.ReadOnlyField()
     password = serializers.CharField(
         write_only=True, 
         style={'input_type': 'password'}
@@ -19,6 +18,10 @@ class BoardSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Board
         fields = '__all__'
+        read_only_fields = [
+            'last_request',
+            'allowed'
+        ]
 
 
 class PinSerializer(serializers.HyperlinkedModelSerializer):
@@ -33,6 +36,20 @@ class PinSerializer(serializers.HyperlinkedModelSerializer):
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
     
+    def validate(self, data):
+        model_validators.pin_validator(
+            status=data['status'], 
+            configuration=data['configuration'], 
+            from_rest=True
+        )
+        return data
+
     class Meta:
         model = models.Pin
+        fields = '__all__'
+
+
+class PeriodicPinSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = models.PeriodicPin
         fields = '__all__'

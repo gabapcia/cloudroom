@@ -6,6 +6,7 @@ from board import views
 router = DefaultRouter()
 router.register(r'boards', views.BoardViewSet)
 router.register(r'pins', views.PinViewSet)
+router.register(r'periodic-pins', views.PeriodicPinViewSet)
 
 
 urlpatterns = [

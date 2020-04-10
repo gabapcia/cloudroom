@@ -60,7 +60,7 @@ def manage_deliveries():
     autoretry_for=(exceptions.MailError,), 
     retry_backoff=True,
     retry_backoff_max=300,
-    max_retries=None
+    max_retries=5
 )
 def send_email(track_number:str, order_name:str, status:str, description:str):
     mail.send_message(
