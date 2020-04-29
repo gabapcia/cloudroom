@@ -1,10 +1,9 @@
 version: "3.7"
 
-
 services: 
   postgres:
     image: postgres:12-alpine
-    restart: always
+    restart: unless-stopped
     env_file: ./cloudroom/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -12,7 +11,7 @@ services:
       - 5432
   redis:
     image: redis:5-alpine
-    restart: always
+    restart: unless-stopped
     volumes: 
       - redis_data:/data
     expose:
@@ -21,8 +20,10 @@ services:
     build: ./cloudroom
     volumes: 
       - ./cloudroom:/usr/app
+      - static_files:/usr/app/static
+      - media_files:/usr/app/media
     env_file: ./cloudroom/.env
-    restart: always
+    restart: unless-stopped
     command: [python, manage.py, runserver, 0.0.0.0:8000]
     entrypoint: [/usr/app/entrypoint.sh]
     ports: 
@@ -34,8 +35,10 @@ services:
     build: ./cloudroom
     volumes: 
       - ./cloudroom:/usr/app
+      - static_files:/usr/app/static
+      - media_files:/usr/app/media
     env_file: ./cloudroom/.env
-    restart: always
+    restart: unless-stopped
     command: [celery, -A, cloudroom, worker, -l, INFO]
     depends_on: 
       - postgres
@@ -44,12 +47,17 @@ services:
     build: ./cloudroom
     volumes: 
       - ./cloudroom:/usr/app
+      - static_files:/usr/app/static
+      - media_files:/usr/app/media
     env_file: ./cloudroom/.env
-    restart: always
+    restart: unless-stopped
     command: [celery, -A, cloudroom, beat, -l, INFO]
     depends_on: 
       - postgres
       - redis
+
 volumes: 
-  postgres_data:
-  redis_data:
+  - postgres_data:
+  - redis_data:
+  - static_files:
+  - media_files:
