@@ -8,6 +8,6 @@ Currently you can:
 - track your orders;
 
 
-## TODO:
-- Virtual Assistent
+TODO:
+- Virtual Assistent (Christine)
 - Documentation
