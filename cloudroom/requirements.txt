@@ -8,8 +8,14 @@ requests
 beautifulsoup4
 sendgrid
 argon2-cffi
-vosk
 pyaudio
+fuzzywuzzy
+channels
+channels_redis
+daphne
+nltk
+python-Levenshtein
+vosk
 
 # Optional
 python-dotenv

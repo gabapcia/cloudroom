@@ -44,7 +44,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.getenv('DJANGO_DEBUG'))
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS').split(' ')
 
 
 # Application definition
@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'board.apps.BoardConfig',
     'orders.apps.OrdersConfig',
+    'christine.apps.ChristineConfig',
 ]
 
 MIDDLEWARE = [
@@ -91,7 +92,15 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'cloudroom.wsgi.application'
+ASGI_APPLICATION = 'cloudroom.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [(os.getenv('REDIS_HOST'), os.getenv('REDIS_PORT'))],
+        },
+    },
+}
 
 # CORS configuration
 CORS_ORIGIN_ALLOW_ALL = True
@@ -163,4 +172,4 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = '/media/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

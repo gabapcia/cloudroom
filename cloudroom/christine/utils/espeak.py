@@ -15,8 +15,10 @@ class Espeak:
         if not os.path.exists(os.path.join('/', 'usr', 'bin', 'espeak-ng')):
             raise RuntimeError('espeak-ng not found')
         
-        assert amplitude >= 0 and amplitude <= 200, \
+        assert (
+            amplitude >= 0 and amplitude <= 200,
             'Amplitude must be between 0 and 200'
+        )
         
         assert pitch >= 0 and pitch <= 99, 'Pitch must be between 0 and 99'
         
@@ -50,8 +52,8 @@ class Espeak:
         else:
             subprocess.Popen(args=self.get_command(phrase=phrase))
 
-    
-    def voices(self) -> List[Dict[AnyStr, AnyStr]]:
+    @staticmethod
+    def voices() -> List[Dict[AnyStr, AnyStr]]:
         output = subprocess.run(
             args=['espeak-ng', '--voices'],
             capture_output=True
@@ -99,4 +101,7 @@ class Espeak:
 
 
 if __name__ == '__main__':
-    Espeak().say('Hello, and, again, welcome to the Aperture Science Computer-aided Enrichment Center')
+    Espeak().say(
+        'Hello, and, again, welcome to the '
+        'Aperture Science Computer-aided Enrichment Center'
+    )
