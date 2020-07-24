@@ -25,6 +25,7 @@ services:
     env_file: ./cloudroom/.env
     restart: unless-stopped
     command: [python, manage.py, runserver, 0.0.0.0:8000]
+    # command: [daphne, -b, "0.0.0.0", -p, "8000", cloudroom.asgi:application]
     entrypoint: [/usr/app/entrypoint.sh]
     ports: 
       - 8000:8000
@@ -55,9 +56,13 @@ services:
     depends_on: 
       - postgres
       - redis
-
+  # vosk:
+  #   image: gabrielbg99/kaldi-en
+  #   restart: unless-stopped
+  #   expose:
+  #     - 2700
 volumes: 
-  - postgres_data:
-  - redis_data:
-  - static_files:
-  - media_files:
+  postgres_data:
+  redis_data:
+  static_files:
+  media_files:

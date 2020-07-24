@@ -1,17 +1,16 @@
-from channels.auth import AuthMiddlewareStack
-from channels.security.websocket import AllowedHostsOriginValidator
-from channels.routing import ProtocolTypeRouter, URLRouter
+"""
+ASGI config for cloudroom project.
 
-from christine import routing
+It exposes the ASGI callable as a module-level variable named ``application``.
 
+For more information on this file, see
+https://docs.djangoproject.com/en/3.0/howto/deployment/asgi/
+"""
 
-application = ProtocolTypeRouter({
-    # (http->django views is added by default)
-    'websocket': AllowedHostsOriginValidator(
-        AuthMiddlewareStack(
-            URLRouter(
-                routing.websocket_urlpatterns
-            )
-        ),
-    ),
-})
+import os
+
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'cloudroom.settings')
+
+application = get_asgi_application()

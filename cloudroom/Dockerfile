@@ -1,5 +1,3 @@
-# TODO: Use kaldi's docker image
-
 FROM python:3.8-alpine
 
 WORKDIR /usr/app
