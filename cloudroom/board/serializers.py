@@ -1,3 +1,4 @@
+import re
 from rest_framework import serializers
 from . import models
 
@@ -5,24 +6,21 @@ from . import models
 class PinSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Pin
-        fields = [
-            'created',
-            'updated',
-            'board',
-            'number',
-            'value',
-            'mode',
-            'is_digital',
-            'description',
-        ]
-        read_only_fields = ['created', 'updated']
+        fields = '__all__'
+        read_only_fields = ['created', 'updated', 'periodic_behaviors']
 
 class BoardSerializer(serializers.ModelSerializer):
-    pins = PinSerializer(many=True, read_only=True, source='pin_set')
+    pins = serializers.HyperlinkedRelatedField(
+        many=True, 
+        read_only=True,
+        view_name='pin-detail',
+        source='pin_set'
+    )
     password = serializers.CharField(
         write_only=True, 
         style={'input_type': 'password'}
     )
+
     class Meta:
         model = models.Board
         fields = '__all__'

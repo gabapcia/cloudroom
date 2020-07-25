@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'django_celery_beat',
     'board.apps.BoardConfig',
     'orders.apps.OrdersConfig',
 ]

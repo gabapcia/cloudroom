@@ -1,6 +1,7 @@
 import argon2
 from django.db import models
 from django.core.validators import MinLengthValidator
+from django_celery_beat.models import PeriodicTask
 
 from .validators import validate_pin_value, validate_digital_pin
 
@@ -39,18 +40,23 @@ class Pin(models.Model):
         INPUT = 1
         OUTPUT = 2
 
-    created     = models.DateTimeField(auto_now_add=True)
-    updated     = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    periodic_behaviors = models.ManyToManyField(PeriodicTask)
 
-    board       = models.ForeignKey(Board, on_delete=models.CASCADE)
-    number      = models.PositiveIntegerField()
-    value       = models.CharField(
-        max_length=3, 
-        validators=[validate_pin_value]
-    )
-    mode        = models.IntegerField(choices=Mode.choices, default=Mode.OUTPUT)
-    is_digital  = models.BooleanField(default=True)
+    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    number = models.PositiveIntegerField()
+    value = models.CharField(max_length=3, validators=[validate_pin_value])
+    mode = models.IntegerField(choices=Mode.choices, default=Mode.OUTPUT)
+    is_digital = models.BooleanField(default=True)
     description = models.CharField(max_length=512, null=True, blank=True)
+
+    def operation_info(self):
+        return {'number': self.number, 'value': self.value, 'mode': self.mode}
+
+    def save(self, *args, **kwargs):
+        if self.is_digital: validate_digital_pin(value=self.value)
+        super().save(*args, **kwargs)
 
     class Meta:
         indexes = [
@@ -66,11 +72,3 @@ class Pin(models.Model):
                 name='pin_constraint'
             )
         ]
-
-    def save(self, *args, **kwargs):
-        if self.is_digital:
-            validate_digital_pin(value=self.value)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f'Pin #{self.number} - {self.board.name}'
