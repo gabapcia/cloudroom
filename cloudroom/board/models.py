@@ -36,23 +36,22 @@ class Board(models.Model):
         ]
 
 class Pin(models.Model):
-    class Mode(models.IntegerChoices):
-        INPUT = 1
-        OUTPUT = 2
-
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     periodic_behaviors = models.ManyToManyField(PeriodicTask)
 
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
     number = models.PositiveIntegerField()
-    value = models.CharField(max_length=3, validators=[validate_pin_value])
-    mode = models.IntegerField(choices=Mode.choices, default=Mode.OUTPUT)
+    value = models.CharField(
+        max_length=3, 
+        validators=[validate_pin_value], 
+        null=True
+    )
     is_digital = models.BooleanField(default=True)
     description = models.CharField(max_length=512, null=True, blank=True)
 
     def operation_info(self):
-        return {'number': self.number, 'value': self.value, 'mode': self.mode}
+        return {'number': self.number, 'value': self.value}
 
     def save(self, *args, **kwargs):
         if self.is_digital: validate_digital_pin(value=self.value)
@@ -70,5 +69,5 @@ class Pin(models.Model):
             models.UniqueConstraint(
                 fields=['number', 'board'], 
                 name='pin_constraint'
-            )
+            ),
         ]

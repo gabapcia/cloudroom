@@ -25,15 +25,46 @@ class PinViewSet(viewsets.ModelViewSet):
     queryset = models.Pin.objects.all()
 
     def get_serializer_class(self):
-        if self.action == 'periodic':
-            return lambda *args, **kwargs: (
-                PeriodicTaskSerializer(app=__package__, *args, **kwargs)
-            )
+        if 'periodic' in self.action: return PeriodicTaskSerializer
         else: return serializers.PinSerializer
 
-    @action(methods=['post'], detail=True)
-    def periodic(self, request, pk):
-        pin = self.get_object()
-        task = self.get_serializer().create(form=request.data)
-        pin.periodic_behaviors.add(task)
-        return Response({})
+    @action(
+        detail=True, 
+        methods=['post', 'delete'], 
+        url_path='periodic/?(?P<task_pk>[^/.]+)?'
+    )
+    def periodic(self, request, pk, task_pk=None):
+        if request.method.lower() == 'delete':
+            if not task_pk: 
+                return Response(
+                    {'detail': 'Task pk not provied'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            pin = self.get_object()
+            if not pin.periodic_behaviors.filter(pk=task_pk).exists():
+                return Response(
+                    {'detail': 'Invalid task'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            pin.periodic_behaviors.remove(task_pk)
+            self.get_serializer().delete_kwargs(pk=task_pk, pins=[pin.pk])
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            pin = self.get_object()
+            task = self.get_serializer().create(
+                form=request.data,
+                task_kwargs={'pins': [pin.pk]}
+            )
+            pin.periodic_behaviors.add(task)
+
+            return Response(
+                self.get_serializer(task).data, 
+                status=status.HTTP_201_CREATED
+            )
+
+    @periodic.mapping.get
+    def list_periodic(self, request, pk):
+        periodic_behaviors = self.get_object().periodic_behaviors
+        return Response(self.get_serializer(periodic_behaviors, many=True).data)
