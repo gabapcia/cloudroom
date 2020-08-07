@@ -13,6 +13,7 @@ fuzzywuzzy
 channels
 channels_redis
 daphne
+lxml
 python-Levenshtein
 
 # Optional

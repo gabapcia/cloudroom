@@ -5,7 +5,6 @@ from orders import views
 
 router = DefaultRouter()
 router.register(r'correios', viewset=views.CorreiosViewSet)
-router.register(r'correios-track', viewset=views.CorreiosInfoViewSet)
 
 
 urlpatterns = [

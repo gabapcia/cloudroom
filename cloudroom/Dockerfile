@@ -1,15 +1,13 @@
-FROM python:3.8-alpine
+FROM python:3-buster
 
 WORKDIR /usr/app
 
-RUN apk update
-RUN echo "http://dl-8.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
-    apk update && \
-    apk add postgresql-dev g++ py3-lxml libffi-dev python3-dev
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install -y --no-install-recommends g++ netcat
 
 COPY ./requirements.txt .
 
 RUN pip install -U pip
-RUN pip install -r requirements.txt
+RUN pip install -Ur requirements.txt
 
 COPY . .

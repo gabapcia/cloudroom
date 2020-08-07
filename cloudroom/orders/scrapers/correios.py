@@ -1,6 +1,6 @@
 import requests, datetime, os, re
 from bs4 import BeautifulSoup
-# from orders.scrapers.util import exceptions
+# from .util import exceptions
 from util import exceptions
 
 import dotenv

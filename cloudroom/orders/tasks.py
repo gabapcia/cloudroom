@@ -1,16 +1,16 @@
 from celery import task
-from orders.scrapers import correios
-from orders import models
+
 from util import mail, exceptions
-import orders.scrapers.util.exceptions as request_exceptions
+from . import models
+from .scrapers import correios
+import .scrapers.exceptions as request_exceptions
 
 
 @task
 def manage_deliveries():
     pending_orders = models.Correios.objects.filter(delivered=False)
 
-    if not pending_orders:
-        return
+    if not pending_orders: return
     
     for order in pending_orders.iterator():
         try:
@@ -62,12 +62,15 @@ def manage_deliveries():
     retry_backoff_max=300,
     max_retries=5
 )
-def send_email(track_number:str, order_name:str, status:str, description:str):
+def send_email(track_number, order_name, status, description):
+    template = (
+        'Hello, Gabriel.\n'
+        f'Your order "{track_number} - {order_name}" '
+        f'status has been updated to "{status}"\n'
+        f'Description: {description}.'
+    )
+
     mail.send_message(
         subject=f'Your {order_name} delivery status has been updated!',
-        template=f'''
-Hello, Gabriel. 
-Your order "{track_number} - {order_name}" status has been updated to "{status}"
-Decription: {description}.        
-        '''
+        template=template
     )
