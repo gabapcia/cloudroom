@@ -59,8 +59,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_celery_beat',
-    'board.apps.BoardConfig',
-    'orders.apps.OrdersConfig',
+    'board',
+    'orders',
 ]
 
 MIDDLEWARE = [

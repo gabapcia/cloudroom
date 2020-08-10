@@ -4,8 +4,8 @@
 
 
 Currently you can: 
-- add your microcontrollers and control your pins;
-- track your orders;
+- add microcontrollers and control their pins;
+- track your orders (Brazil);
 
 
 TODO:

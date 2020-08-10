@@ -3,7 +3,7 @@ from celery import task
 from util import mail, exceptions
 from . import models
 from .scrapers import correios
-import .scrapers.exceptions as request_exceptions
+from .scrapers.util import exceptions as tracking_exceptions
 
 
 @task
@@ -15,10 +15,10 @@ def manage_deliveries():
     for order in pending_orders.iterator():
         try:
             result, need_cpf = correios.delivery_info(code=order.code)
-        except request_exceptions.InvalidTrackingCode:
+        except tracking_exceptions.InvalidTrackingCode:
             order.delete()
             continue
-        except request_exceptions.OrderNotShipped:
+        except tracking_exceptions.OrderNotShipped:
             continue
 
         if need_cpf and not order.cpf_registered:
@@ -26,10 +26,10 @@ def manage_deliveries():
                 correios.register_cpf(order.code)
                 order.cpf_registered = True
                 order.save()
-            except request_exceptions.DocumentAlreadyRegistered:
+            except tracking_exceptions.DocumentAlreadyRegistered:
                 order.cpf_registered = True
                 order.save()
-            except request_exceptions.OrderNotFound:
+            except tracking_exceptions.OrderNotFound:
                 pass
 
         order.last_update = result[-1]['Date']
@@ -54,7 +54,6 @@ def manage_deliveries():
                     status=info['Info']['Status'],
                     description=info['Info']['Description']
                 )
-
 
 @task(
     autoretry_for=(exceptions.MailError,), 
