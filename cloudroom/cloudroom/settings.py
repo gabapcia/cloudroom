@@ -18,12 +18,7 @@ REDIS_URL = f'redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}'
 
 # Celery variables
 CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = REDIS_URL
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'America/Sao_Paulo'
-# Periodic Tasks
 CELERY_BEAT_SCHEDULE = {
     'Track orders': {
         'task': 'orders.tasks.manage_deliveries',
@@ -58,7 +53,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'django_celery_beat',
     'board',
     'orders',
 ]

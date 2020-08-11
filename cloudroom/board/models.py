@@ -1,7 +1,6 @@
 import argon2
 from django.db import models
 from django.core.validators import MinLengthValidator
-from django_celery_beat.models import PeriodicTask
 
 from .validators import validate_pin_value, validate_digital_pin
 
@@ -36,19 +35,17 @@ class Board(models.Model):
         ]
 
 class Pin(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    periodic_behaviors = models.ManyToManyField(PeriodicTask)
+    created     = models.DateTimeField(auto_now_add=True)
+    updated     = models.DateTimeField(auto_now=True)
 
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
-    number = models.PositiveIntegerField()
-    value = models.CharField(
+    board       = models.ForeignKey(Board, on_delete=models.CASCADE)
+    number      = models.PositiveIntegerField()
+    value       = models.CharField(
         max_length=3, 
-        validators=[validate_pin_value], 
-        null=True
+        validators=[validate_pin_value]
     )
-    is_digital = models.BooleanField(default=True)
-    description = models.CharField(max_length=512, null=True, blank=True)
+    is_digital  = models.BooleanField(default=True)
+    description = models.CharField(max_length=512, null=True)
 
     def operation_info(self):
         return {'number': self.number, 'value': self.value}

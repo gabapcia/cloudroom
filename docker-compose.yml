@@ -52,7 +52,7 @@ services:
       - media_files:/usr/app/media
     env_file: ./cloudroom/.env
     restart: unless-stopped
-    command: [celery, -A, cloudroom, beat, -l, INFO, --scheduler, django_celery_beat.schedulers:DatabaseScheduler]
+    command: [celery, -A, cloudroom, beat, -l, INFO]
     depends_on: 
       - postgres
       - redis
