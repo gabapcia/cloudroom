@@ -53,8 +53,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'channels',
     'board',
     'orders',
+    'christine'
 ]
 
 MIDDLEWARE = [
@@ -86,7 +88,7 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = 'cloudroom.asgi.application'
+ASGI_APPLICATION = 'cloudroom.routing.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
@@ -103,12 +105,12 @@ CORS_ORIGIN_ALLOW_ALL = True
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #     'rest_framework.authentication.SessionAuthentication',
-    # ),
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 
 
