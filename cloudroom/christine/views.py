@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ReadOnlyModelViewSet
+from . import serializers, models
 
 
-def room(request):
-    return render(request, 'christine/room.html')
+class MessageViewSet(ReadOnlyModelViewSet):
+    queryset = models.Message.objects.all().order_by('-created')
+    serializer_class = serializers.MessageSerializer

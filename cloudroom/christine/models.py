@@ -23,10 +23,14 @@ class ChristineResponse(models.Model):
         RESULT = 2
         ERROR = 3
 
+    message         = models.OneToOneField(
+        Message, 
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
     created         = models.DateTimeField(auto_now_add=True)
     updated         = models.DateTimeField(auto_now=True)
 
-    message         = models.ForeignKey(Message, on_delete=models.CASCADE)
     command_type    = models.IntegerField(choices=CommandType.choices)
     text            = models.TextField()
     content         = models.JSONField(null=True)
