@@ -14,6 +14,7 @@ channels_redis
 daphne
 lxml
 python-Levenshtein
+nltk
 
 # Optional
 python-dotenv

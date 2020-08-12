@@ -1,0 +1,22 @@
+{
+  "greeting": {
+    "description": "Gives a greeting",
+    "activators": ["hey", "hello", "hi"],
+    "default": []
+  },
+  "doc": {
+    "description": "Describe all modules",
+    "activators": ["docs", "documentation", "info", "information"],
+    "default": []
+  },
+  "search": {
+    "description": "Search some phrase on DuckDuckGo",
+    "activators": ["search"],
+    "default": ["What do you want to know?"]
+  },
+  "board": {
+    "description": "Control your CloudRoom boards",
+    "activators": ["control"],
+    "default": ["What can I do for you?"]
+  }
+}
