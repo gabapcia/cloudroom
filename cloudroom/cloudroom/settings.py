@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'dj_rest_auth',
     'corsheaders',
     'channels',
     'board',
@@ -106,12 +107,18 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
 }
+
+REST_USE_JWT = True
+JWT_AUTH_HTTPONLY = True
+REST_SESSION_LOGIN = True
+JWT_AUTH_COOKIE = 'cloudroom-auth'
+JWT_AUTH_COOKIE_USE_CSRF = True
 
 
 # Database
