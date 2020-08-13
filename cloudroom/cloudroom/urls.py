@@ -21,5 +21,5 @@ urlpatterns = [
     path('api/room/', include('board.urls')),
     path('api/tracking/', include('orders.urls')),
     path('api/christine/', include('christine.urls')),
-    path('api/auth/', include('dj_rest_auth.urls'))
+    path('api/auth/', include('auth.urls'))
 ]
