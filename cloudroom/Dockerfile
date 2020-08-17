@@ -1,6 +1,6 @@
 FROM python:3-buster
 
-WORKDIR /usr/app
+WORKDIR /var/app
 
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends g++ netcat

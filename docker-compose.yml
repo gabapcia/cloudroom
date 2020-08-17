@@ -19,14 +19,13 @@ services:
   django:
     build: ./cloudroom
     volumes: 
-      - ./cloudroom:/usr/app
-      - static_files:/usr/app/static
-      - media_files:/usr/app/media
+      - ./cloudroom:/var/app
+      - static_files:/var/app/static
+      - media_files:/var/app/media
     env_file: ./cloudroom/.env
     restart: unless-stopped
-    command: [python, manage.py, runserver, 0.0.0.0:8000]
-    # command: [daphne, -b, "0.0.0.0", -p, "8000", cloudroom.asgi:application]
-    entrypoint: [/usr/app/entrypoint.sh]
+    command: [./manage.py, runserver, 0.0.0.0:8000]
+    entrypoint: [/var/app/entrypoint.sh]
     ports: 
       - 8000:8000
     depends_on: 
@@ -35,9 +34,9 @@ services:
   celery_worker:
     build: ./cloudroom
     volumes: 
-      - ./cloudroom:/usr/app
-      - static_files:/usr/app/static
-      - media_files:/usr/app/media
+      - ./cloudroom:/var/app
+      - static_files:/var/app/static
+      - media_files:/var/app/media
     env_file: ./cloudroom/.env
     restart: unless-stopped
     command: [celery, -A, cloudroom, worker, -l, INFO]
@@ -47,20 +46,15 @@ services:
   celery_beat:
     build: ./cloudroom
     volumes: 
-      - ./cloudroom:/usr/app
-      - static_files:/usr/app/static
-      - media_files:/usr/app/media
+      - ./cloudroom:/var/app
+      - static_files:/var/app/static
+      - media_files:/var/app/media
     env_file: ./cloudroom/.env
     restart: unless-stopped
     command: [celery, -A, cloudroom, beat, -l, INFO]
     depends_on: 
       - postgres
       - redis
-  # vosk:
-  #   image: gabrielbg99/kaldi-en
-  #   restart: unless-stopped
-  #   expose:
-  #     - 2700
 volumes: 
   postgres_data:
   redis_data:

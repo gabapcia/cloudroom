@@ -12,7 +12,7 @@ LOGIN_ENDPOINT = '/portalimportador'
 
 
 def _parse_info(resp):
-    soup = BeautifulSoup(resp.content, 'lxml')\
+    soup = BeautifulSoup(resp.content, 'html.parser')\
         .find('div', class_='ctrlcontent').find_all('table', class_='listEvent')
     items = [
         i.find_all('td') for i in soup
@@ -62,12 +62,12 @@ def delivery_info(code : str):
 
 def _do_login(s):
     resp = s.get(BASE_URL + LOGIN_ENDPOINT)
-    link = BeautifulSoup(resp.content, 'lxml')\
+    link = BeautifulSoup(resp.content, 'html.parser')\
         .find('head').find('meta', attrs={'http-equiv': 'Refresh'})\
             ['content'][len('0;url='):]
     resp = s.get(BASE_URL + link)
     
-    soup = BeautifulSoup(resp.content, 'lxml').find('form')
+    soup = BeautifulSoup(resp.content, 'html.parser').find('form')
     form_data = {
         'username': os.getenv('MY_EMAIL'),
         'password': os.getenv('CORREIOS_PASS'),
@@ -81,7 +81,7 @@ def _do_login(s):
 
 
 def _find_item(s, resp, code):
-    soup = BeautifulSoup(resp.content, 'lxml')\
+    soup = BeautifulSoup(resp.content, 'html.parser')\
         .find('div', class_='content').find('form')
     form_data = {
         'form-pesquisarRemessas': 'form-pesquisarRemessas',

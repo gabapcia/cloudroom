@@ -1,7 +1,10 @@
+from datetime import datetime
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.contrib.auth import login as django_login
-from django.contrib.auth import logout as django_logout
+from django.contrib.auth import (
+    get_user_model,
+    login as django_login,
+    logout as django_logout,
+)
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
@@ -15,6 +18,7 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework_simplejwt.settings import api_settings as jwt_stgs
 
 from .app_settings import (
     JWTSerializer, 
@@ -52,27 +56,30 @@ class TokenCookieRefreshView(TokenViewBase):
 class LoginView(GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
-    throttle_scope = 'dj_rest_auth'
 
     @sensitive_post_parameters_m
     def dispatch(self, *args, **kwargs):
         return super(LoginView, self).dispatch(*args, **kwargs)
 
-    def process_login(self):
-        django_login(self.request, self.user)
-
-    def get_response_serializer(self):
-        return JWTSerializer
-
     def login(self):
         self.user = self.serializer.validated_data['user']
         self.access_token, self.refresh_token = jwt_encode(self.user)
 
-        if getattr(settings, 'REST_SESSION_LOGIN', True): self.process_login()
+        if getattr(settings, 'REST_SESSION_LOGIN', True):
+            django_login(self.request, self.user)
 
-    def set_auth_cookie(self, response):
-        from datetime import datetime
-        from rest_framework_simplejwt.settings import api_settings as jwt_stgs
+    def get_response(self):
+        data = {
+            'user': self.user,
+            'access_token': self.access_token,
+            'refresh_token': self.refresh_token
+        }
+        serializer = JWTSerializer(
+            instance=data,
+            context=self.get_serializer_context()
+        )
+
+        response = Response(serializer.data, status=status.HTTP_200_OK)
         response.set_cookie(
             settings.JWT_AUTH_REFRESH_COOKIE,
             self.refresh_token,
@@ -81,22 +88,6 @@ class LoginView(GenericAPIView):
             httponly=True,
             samesite='Lax'
         )
-
-    def get_response(self):
-        serializer_class = self.get_response_serializer()
-
-        data = {
-            'user': self.user,
-            'access_token': self.access_token,
-            'refresh_token': self.refresh_token
-        }
-        serializer = serializer_class(
-            instance=data,
-            context=self.get_serializer_context()
-        )
-
-        response = Response(serializer.data, status=status.HTTP_200_OK)
-        self.set_auth_cookie(response)
         return response
 
     def post(self, request, *args, **kwargs):
@@ -108,14 +99,7 @@ class LoginView(GenericAPIView):
         return self.get_response()
 
 class LogoutView(APIView):
-    """
-    Calls Django logout method and delete the Token object
-    assigned to the current User object.
-
-    Accepts/Returns nothing.
-    """
     permission_classes = (AllowAny,)
-    throttle_scope = 'dj_rest_auth'
 
     def get(self, request, *args, **kwargs):
         if getattr(settings, 'ACCOUNT_LOGOUT_ON_GET', False):
@@ -141,60 +125,11 @@ class LogoutView(APIView):
             status=status.HTTP_200_OK
         )
 
-        cookie_name = getattr(settings, 'JWT_AUTH_REFRESH_COOKIE', None)
-        if cookie_name: response.delete_cookie(cookie_name)
-        elif 'rest_framework_simplejwt.token_blacklist' in settings.INSTALLED_APPS:
-            # add refresh token to blacklist
-            try:
-                token = RefreshToken(request.data['refresh'])
-                token.blacklist()
-
-            except KeyError:
-                response = Response(
-                    {"detail": _("Refresh token was not included in request data.")},
-                    status=status.HTTP_401_UNAUTHORIZED
-                )
-
-            except (TokenError, AttributeError, TypeError) as error:
-                if hasattr(error, 'args'):
-                    if 'Token is blacklisted' in error.args or 'Token is invalid or expired' in error.args:
-                        response = Response({"detail": _(error.args[0])},
-                                            status=status.HTTP_401_UNAUTHORIZED)
-
-                    else:
-                        response = Response(
-                            {"detail": _("An error has occurred.")},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                        )
-
-                else:
-                    response = Response(
-                        {"detail": _("An error has occurred.")},
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
-        else:
-            response = Response(
-                {"detail": _(
-                    'Neither cookies or blacklist are enabled, '
-                    'so the token has not been deleted server side. '
-                    'Please make sure the token is deleted client side.'
-                )}, 
-                status=status.HTTP_200_OK
-            )
+        response.delete_cookie(settings.JWT_AUTH_REFRESH_COOKIE)
 
         return response
 
 class UserDetailsView(RetrieveUpdateAPIView):
-    """
-    Reads and updates UserModel fields
-    Accepts GET, PUT, PATCH methods.
-
-    Default accepted fields: username, first_name, last_name
-    Default display fields: pk, username, email, first_name, last_name
-    Read-only fields: pk, email
-
-    Returns UserModel fields.
-    """
     serializer_class = UserDetailsSerializer
     permission_classes = (IsAuthenticated,)
 
