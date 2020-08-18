@@ -1,8 +1,8 @@
 from django.contrib import admin
-from board.models import Board
+from boards.models import boards
 
 
-class BoardAdmin(admin.ModelAdmin):
+class boardsAdmin(admin.ModelAdmin):
     fields = [
         'name',
         'status',
@@ -10,4 +10,4 @@ class BoardAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(Board, BoardAdmin)
+admin.site.register(boards, boardsAdmin)

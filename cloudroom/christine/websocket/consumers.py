@@ -1,8 +1,8 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.auth import get_user
 from channels.db import database_sync_to_async
-from .engine import Engine
-from .models import ChristineResponse, Message
+from ..engine import Engine
+from ..models import ChristineResponse, Message
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):

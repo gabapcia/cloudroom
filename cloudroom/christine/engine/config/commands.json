@@ -14,8 +14,8 @@
     "activators": ["search"],
     "default": ["What do you want to know?"]
   },
-  "board": {
-    "description": "Control your CloudRoom boards",
+  "boards": {
+    "description": "Control your CloudRoom boardss",
     "activators": ["control"],
     "default": ["What can I do for you?"]
   }
