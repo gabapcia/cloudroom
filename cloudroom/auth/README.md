@@ -1,3 +1,1 @@
-## This app is based on dj_rest_auth
-
-dj_rest_auth: https://github.com/jazzband/dj-rest-auth
+## This app is based on [https://github.com/jazzband/dj-rest-auth](dj-rest-auth)

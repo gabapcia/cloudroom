@@ -1,10 +1,8 @@
 import requests, datetime, os, re
 from bs4 import BeautifulSoup
-# from .util import exceptions
-from util import exceptions
+from . import exceptions
+# from util import exceptions
 
-import dotenv
-dotenv.load_dotenv()
 
 TRACK_URL = 'https://www2.correios.com.br/sistemas/rastreamento/ctrl/ctrlRastreamento.cfm?'
 BASE_URL = 'https://apps.correios.com.br'
@@ -41,8 +39,7 @@ def _parse_info(resp):
     parsed.reverse()
     return parsed, need_cpf
 
-
-def delivery_info(code : str):
+def delivery_info(code: str):
     if len(code) != 13:
         raise exceptions.InvalidTrackingCode
 
@@ -58,7 +55,6 @@ def delivery_info(code : str):
     
     result, need_cpf = _parse_info(resp)
     return result, need_cpf
-
 
 def _do_login(s):
     resp = s.get(BASE_URL + LOGIN_ENDPOINT)
@@ -78,7 +74,6 @@ def _do_login(s):
     link = soup['action']
     
     return s.post(BASE_URL + link, data=form_data)
-
 
 def _find_item(s, resp, code):
     soup = BeautifulSoup(resp.content, 'html.parser')\
@@ -111,7 +106,6 @@ def _find_item(s, resp, code):
 
     return s.get(BASE_URL + link)
 
-
 def _register_cpf(s, resp):
     soup = BeautifulSoup(resp.content).find('form', id='form-autodeclaracao')
     form_data = {
@@ -127,8 +121,7 @@ def _register_cpf(s, resp):
 
     return resp
 
-
-def register_cpf(code : str):
+def register_cpf(code: str):
     s = requests.Session()
     resp = _do_login(s)
     resp = _find_item(s, resp, code)
@@ -136,5 +129,7 @@ def register_cpf(code : str):
     
 
 if __name__ == '__main__':
-    register_cpf('LB332085924SE')
-    # delivery_info('LB332085924SE')
+    import dotenv
+    dotenv.load_dotenv()
+
+    delivery_info('OJ695906006BR')

@@ -2,13 +2,17 @@ from rest_framework import serializers
 from orders import models
 
 
-class CorreiosInfoSerializer(serializers.HyperlinkedModelSerializer):
+class CorreiosInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CorreiosInfo
         fields = '__all__'
 
-class CorreiosSerializer(serializers.HyperlinkedModelSerializer):
-    details = CorreiosInfoSerializer(many=True, source='correiosinfo_set')
+class CorreiosSerializer(serializers.ModelSerializer):
+    details = CorreiosInfoSerializer(
+        read_only=True, 
+        many=True, 
+        source='correiosinfo_set'
+    )
 
     class Meta:
         model = models.Correios
@@ -19,5 +23,4 @@ class CorreiosSerializer(serializers.HyperlinkedModelSerializer):
             'delivered',
             'last_update',
             'cpf_registered',
-            'details',
         ]

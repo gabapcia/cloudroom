@@ -1,5 +1,4 @@
 from celery import task
-
 from . import models
 
 

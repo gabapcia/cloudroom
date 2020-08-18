@@ -1,8 +1,7 @@
 import argon2
 from django.db import models
 from django.core.validators import MinLengthValidator
-
-from .validators import validate_pin_value, validate_digital_pin
+from .core.validators import validate_pin_value, validate_digital_pin
 
 
 class Board(models.Model):

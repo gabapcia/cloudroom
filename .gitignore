@@ -131,3 +131,5 @@ dmypy.json
 # Local dependences
 .vscode/
 kaldi_model/
+static/
+media/

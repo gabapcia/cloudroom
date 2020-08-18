@@ -1,8 +1,8 @@
+import argon2, base64
 from contextlib import suppress
 from rest_framework.permissions import BasePermission
-from .models import Board
-from .decorators import false_on_exception
-import argon2, base64
+from ..models import Board
+from ..utils.decorators import false_on_exception
 
 
 class BoardPermission(BasePermission):

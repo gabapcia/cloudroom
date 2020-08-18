@@ -1,9 +1,8 @@
 from celery import task
-
-from util import mail, exceptions
+from cloudroom.utils import mail, exceptions
 from . import models
 from .scrapers import correios
-from .scrapers.util import exceptions as tracking_exceptions
+from .scrapers import exceptions as tracking_exceptions
 
 
 @task
@@ -70,6 +69,6 @@ def send_email(track_number, order_name, status, description):
     )
 
     mail.send_message(
-        subject=f'Your {order_name} delivery status has been updated!',
+        subject=f'"{order_name}" delivery status has been updated!',
         template=template
     )
