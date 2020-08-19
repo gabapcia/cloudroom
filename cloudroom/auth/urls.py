@@ -8,8 +8,8 @@ from .views import (
 
 
 urlpatterns = [
-    path('refresh/', TokenCookieRefreshView.as_view(), name='token'),
+    path('refresh/', TokenCookieRefreshView.as_view(), name='refresh-token'),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('user/', UserDetailsView.as_view(), name='user_details'),
+    path('user/', UserDetailsView.as_view(), name='user-detail'),
 ]

@@ -1,11 +1,7 @@
-from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
-from django.utils.module_loading import import_string
 from rest_framework import exceptions, serializers
 from rest_framework.exceptions import ValidationError
-
-try: from django.utils.translation import gettext_lazy as _
-except ImportError: from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 UserModel = get_user_model()
@@ -84,20 +80,14 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 class UserDetailsSerializer(serializers.ModelSerializer):
-    """
-    User model w/o password
-    """
     class Meta:
         model = UserModel
         fields = ('pk', 'username', 'email', 'first_name', 'last_name')
         read_only_fields = ('email', )
 
 class JWTSerializer(serializers.Serializer):
-    """
-    Serializer for JWT authentication.
-    """
-    access_token = serializers.CharField()
-    refresh_token = serializers.CharField()
+    access = serializers.CharField()
+    refresh = serializers.CharField()
     user = serializers.SerializerMethodField()
 
     def get_user(self, obj):

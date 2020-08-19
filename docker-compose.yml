@@ -1,8 +1,9 @@
-version: "3.7"
+version: "3.8"
 
 services: 
   postgres:
     image: postgres:12-alpine
+    container_name: postgres
     restart: unless-stopped
     env_file: ./cloudroom/.env
     volumes:
@@ -11,6 +12,7 @@ services:
       - 5432
   redis:
     image: redis:alpine
+    container_name: redis
     restart: unless-stopped
     volumes: 
       - redis_data:/data
@@ -18,6 +20,7 @@ services:
       - 6379
   django:
     build: ./cloudroom
+    container_name: django
     volumes: 
       - ./cloudroom:/var/app
       - static_files:/var/app/static
@@ -33,6 +36,7 @@ services:
       - redis
   celery_worker:
     build: ./cloudroom
+    container_name: celery_worker
     volumes: 
       - ./cloudroom:/var/app
       - static_files:/var/app/static
@@ -45,6 +49,7 @@ services:
       - redis
   celery_beat:
     build: ./cloudroom
+    container_name: celery_beat
     volumes: 
       - ./cloudroom:/var/app
       - static_files:/var/app/static

@@ -7,7 +7,7 @@ from django.contrib.auth import (
 )
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.debug import sensitive_post_parameters
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, RetrieveUpdateAPIView
@@ -71,8 +71,8 @@ class LoginView(GenericAPIView):
     def get_response(self):
         data = {
             'user': self.user,
-            'access_token': self.access_token,
-            'refresh_token': self.refresh_token
+            'access': self.access_token,
+            'refresh': self.refresh_token
         }
         serializer = JWTSerializer(
             instance=data,
@@ -118,7 +118,8 @@ class LogoutView(APIView):
         except (AttributeError, ObjectDoesNotExist):
             pass
 
-        if getattr(settings, 'REST_SESSION_LOGIN', True): django_logout(request)
+        if getattr(settings, 'REST_SESSION_LOGIN', True):
+            django_logout(request)
 
         response = Response(
             {"detail": _("Successfully logged out.")},
