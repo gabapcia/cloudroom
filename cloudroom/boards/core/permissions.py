@@ -1,4 +1,4 @@
-import argon2, base64
+import base64
 from contextlib import suppress
 from rest_framework.permissions import BasePermission
 from ..models import Board
@@ -10,7 +10,8 @@ class BoardPermission(BasePermission):
 
     @false_on_exception
     def has_permission(self, request, view):
-        if not (auth := request.headers.get('Authorization', '')):
+        auth = request.headers.get('Authorization', '')
+        if not auth:
             return False
 
         auth = base64.b64decode(auth.encode('ascii')).decode('ascii')
@@ -18,11 +19,8 @@ class BoardPermission(BasePermission):
 
         board = Board.objects.get(pk=id)
 
-        ph = argon2.PasswordHasher()
-        ph.verify(board.password, password)
-        if ph.check_needs_rehash(board.password):
-            board.password = ph.hash(password)
-            board.save()
+        board.verify_password(password=password)
+
         request.board = board
         return True
 

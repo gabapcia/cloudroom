@@ -23,6 +23,14 @@ class Board(models.Model):
             self.password = ph.hash(self.password)
         super().save(*args, **kwargs)
 
+    def verify_password(self, password):
+        ph = argon2.PasswordHasher()
+        ph.verify(self.password, password)
+
+        if ph.check_needs_rehash(self.password):
+            self.password = ph.hash(password)
+            self.save()
+
     def __str__(self):
         return f'Board ID: #{self.pk} - {self.name}'
 
