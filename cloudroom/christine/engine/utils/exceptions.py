@@ -8,12 +8,14 @@ class ActionNotFound(Exception):
     def __str__(self):
         return f'The action for "{self.activator}" was not found'
 
+
 @dataclass
 class ModuleNotConfigured(Exception):
     name: str
 
     def __str__(self):
         return f'No module named "{self.name}" was found'
+
 
 @dataclass
 class InvalidCommand(Exception):

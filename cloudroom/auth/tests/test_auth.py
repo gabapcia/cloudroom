@@ -13,7 +13,7 @@ class TestAuth(BaseTests):
         cookie = response.cookies.get(cookie_name, '')
         assert response.status_code == 200
         assert not cookie.value
-    
+
     def test_user_detail(self, client, login):
         login(need_create=True)
         response = client.get(reverse('user-detail'))

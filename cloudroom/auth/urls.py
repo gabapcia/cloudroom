@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     TokenCookieRefreshView,
     LoginView,
-    LogoutView, 
+    LogoutView,
     UserDetailsView,
 )
 

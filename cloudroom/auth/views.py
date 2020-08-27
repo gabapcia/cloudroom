@@ -15,13 +15,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenViewBase
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.settings import api_settings as jwt_stgs
 
 from .app_settings import (
-    JWTSerializer, 
+    JWTSerializer,
     LoginSerializer,
     UserDetailsSerializer,
 )
@@ -52,6 +51,7 @@ class TokenCookieRefreshView(TokenViewBase):
             raise InvalidToken(e.args[0])
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
 
 class LoginView(GenericAPIView):
     permission_classes = (AllowAny,)
@@ -98,6 +98,7 @@ class LoginView(GenericAPIView):
         self.login()
         return self.get_response()
 
+
 class LogoutView(APIView):
     permission_classes = (AllowAny,)
 
@@ -129,6 +130,7 @@ class LogoutView(APIView):
         response.delete_cookie(settings.JWT_AUTH_REFRESH_COOKIE)
 
         return response
+
 
 class UserDetailsView(RetrieveUpdateAPIView):
     serializer_class = UserDetailsSerializer

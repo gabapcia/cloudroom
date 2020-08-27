@@ -17,9 +17,9 @@ class TestsPin(BaseBoardTests):
             response = client.get(url(kwargs={}))
         except NoReverseMatch:
             response = client.get(url(kwargs={'pk': pin[0]['id']}))
-    
+
         assert response.status_code == 403
-    
+
     @pytest.mark.parametrize('url', URLS)
     def test_admin_access(self, admin_client, url, pin):
         try:
@@ -65,7 +65,6 @@ class TestsPin(BaseBoardTests):
         )
         assert response.status_code == 200
         assert response.json()['value'] == 'OFF'
-
 
         response = admin_client.patch(
             url,

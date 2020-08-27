@@ -10,6 +10,7 @@ def import_callable(path_or_callable):
         package, attr = path_or_callable.rsplit('.', 1)
         return getattr(import_module(package), attr)
 
+
 def jwt_encode(user):
     from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
     rest_auth_serializers = getattr(settings, 'REST_AUTH_SERIALIZERS', {})

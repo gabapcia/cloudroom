@@ -7,6 +7,7 @@ class ChristineResponseSerializer(serializers.ModelSerializer):
         model = models.ChristineResponse
         fields = '__all__'
 
+
 class MessageSerializer(serializers.ModelSerializer):
     response = ChristineResponseSerializer(source='christineresponse')
 

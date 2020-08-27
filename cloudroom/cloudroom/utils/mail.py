@@ -13,5 +13,5 @@ def send_message(subject: str, template: str) -> None:
     )
     try:
         SendGridAPIClient(os.getenv('SENDGRID_API_KEY')).send(message)
-    except Exception as e:
+    except Exception:
         raise MailError

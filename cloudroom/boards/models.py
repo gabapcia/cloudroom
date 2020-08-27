@@ -41,17 +41,18 @@ class Board(models.Model):
             models.Index(fields=['status']),
         ]
 
-class Pin(models.Model):
-    created     = models.DateTimeField(auto_now_add=True)
-    updated     = models.DateTimeField(auto_now=True)
 
-    board       = models.ForeignKey(Board, on_delete=models.CASCADE)
-    number      = models.PositiveIntegerField()
-    value       = models.CharField(
-        max_length=3, 
+class Pin(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    number = models.PositiveIntegerField()
+    value = models.CharField(
+        max_length=3,
         validators=[validate_pin_value]
     )
-    is_digital  = models.BooleanField(default=True)
+    is_digital = models.BooleanField(default=True)
     description = models.CharField(max_length=512, null=True)
 
     def operation_info(self):
@@ -67,12 +68,12 @@ class Pin(models.Model):
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=['number', 'board'], 
+                fields=['number', 'board'],
                 name='pin_constraint'
             ),
             models.CheckConstraint(
                 check=(
-                    models.Q(value__regex=r'ON|OFF', is_digital=True) | 
+                    models.Q(value__regex=r'ON|OFF', is_digital=True) |
                     models.Q(value__regex=r'^\d+$', is_digital=False)
                 ),
                 name='pin_value_by_type',

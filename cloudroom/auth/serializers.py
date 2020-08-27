@@ -1,6 +1,5 @@
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import exceptions, serializers
-from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
@@ -56,7 +55,7 @@ class LoginSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         user = None
-        
+
         if email:
             try:
                 username = UserModel.objects.get(
@@ -79,11 +78,13 @@ class LoginSerializer(serializers.Serializer):
         attrs['user'] = user
         return attrs
 
+
 class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
         fields = ('pk', 'username', 'email', 'first_name', 'last_name')
         read_only_fields = ('email', )
+
 
 class JWTSerializer(serializers.Serializer):
     access = serializers.CharField()

@@ -5,27 +5,27 @@ from typing import Any, Dict, Tuple
 # Adapted from https://stackoverflow.com/a/53400669
 class Word2Number:
     ordinal_words = {
-        'first': 1, 
-        'second': 2, 
-        'third': 3, 
-        'fifth': 5, 
-        'eighth': 8, 
-        'ninth': 9, 
+        'first': 1,
+        'second': 2,
+        'third': 3,
+        'fifth': 5,
+        'eighth': 8,
+        'ninth': 9,
         'twelfth': 12
     }
     ordinal_endings = [
-        ('ieth', 'y'), 
+        ('ieth', 'y'),
         ('th', '')
     ]
     scales = [
-        'hundred', 
-        'thousand', 
-        'million', 
-        'billion', 
+        'hundred',
+        'thousand',
+        'million',
+        'billion',
         'trillion'
     ]
     units = [
-        'zero', 
+        'zero',
         'one',
         'two',
         'three',
@@ -47,15 +47,15 @@ class Word2Number:
         'nineteen',
     ]
     tens = [
-        '', 
-        '', 
-        'twenty', 
-        'thirty', 
-        'forty', 
-        'fifty', 
-        'sixty', 
-        'seventy', 
-        'eighty', 
+        '',
+        '',
+        'twenty',
+        'thirty',
+        'forty',
+        'fifty',
+        'sixty',
+        'seventy',
+        'eighty',
         'ninety'
     ]
 
@@ -67,13 +67,13 @@ class Word2Number:
             'and': (1, 0)
         }
 
-        for idx, word in enumerate(self.units): 
+        for idx, word in enumerate(self.units):
             numwords[word] = (1, idx)
-        for idx, word in enumerate(self.tens): 
+        for idx, word in enumerate(self.tens):
             numwords[word] = (1, idx * 10)
-        for idx, word in enumerate(self.scales): 
+        for idx, word in enumerate(self.scales):
             numwords[word] = (10 ** (idx * 3 or 2), 0)
-        
+
         return numwords
 
     def __is_numword(self, x: Any) -> bool:
@@ -99,7 +99,7 @@ class Word2Number:
 
         for word in textnum.split():
             if word in self.ordinal_words:
-                scale, increment = (1, self.ordinal_words[word])
+                scale, increment = 1, self.ordinal_words[word]
                 current = current * scale + increment
                 if scale > 100:
                     result += current
@@ -111,15 +111,15 @@ class Word2Number:
                 word_before = word
                 for ending, replacement in self.ordinal_endings:
                     if word.endswith(ending):
-                        word = "%s%s" % (word[:-len(ending)], replacement)
+                        word = f'{word[:-len(ending)]}{replacement}'
 
                 if (
-                    not self.__is_numword(word) or 
+                    not self.__is_numword(word) or
                     (word == 'and' and not lastscale)
                 ):
                     if onnumber:
-                        curstring += repr(result + current) + " "
-                    curstring += word_before + " "
+                        curstring += repr(result + current) + ' '
+                    curstring += word_before + ' '
                     result = current = 0
                     onnumber = False
                     lastunit = False
@@ -128,23 +128,23 @@ class Word2Number:
                     scale, increment = self.__from_numword(word)
                     onnumber = True
 
-                    if lastunit and (word not in self.scales):                                                                                                                                                                                                                
-                        curstring += repr(result + current)                                                                                                                                                                                                                                       
-                        result = current = 0                                                                                                                                                                                                                                                      
+                    if lastunit and (word not in self.scales):
+                        curstring += repr(result + current)
+                        result = current = 0
 
-                    if scale > 1:                                                                                                                                                                                                                                                                 
-                        current = max(1, current)                                                                                                                                                                                                                                                 
+                    if scale > 1:
+                        current = max(1, current)
 
-                    current = current * scale + increment                                                                                                                                                                                                                                         
-                    if scale > 100:                                                                                                                                                                                                                                                               
-                        result += current                                                                                                                                                                                                                                                         
-                        current = 0                                                                                                                                                                                                                                                               
+                    current = current * scale + increment
+                    if scale > 100:
+                        result += current
+                        current = 0
 
-                    lastscale = False                                                                                                                                                                                                              
-                    lastunit = False                                                                                                                                                
-                    if word in self.scales:                                                                                                                                                                                                             
-                        lastscale = True                                                                                                                                                                                                         
-                    elif word in self.units:                                                                                                                                                                                                             
+                    lastscale = False
+                    lastunit = False
+                    if word in self.scales:
+                        lastscale = True
+                    elif word in self.units:
                         lastunit = True
 
         if onnumber:
@@ -158,6 +158,6 @@ class Word2Number:
             x = x.replace(',', '')
         try:
             float(x)
-        except:
+        except Exception:
             return False
         return True

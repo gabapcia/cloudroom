@@ -2,7 +2,7 @@ from .serializers import (
     JWTSerializer as DefaultJWTSerializer,
     LoginSerializer as DefaultLoginSerializer,
     UserDetailsSerializer as DefaultUserDetailsSerializer
-) 
+)
 from django.conf import settings
 from .utils import import_callable
 

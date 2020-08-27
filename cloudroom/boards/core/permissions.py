@@ -1,5 +1,4 @@
 import base64
-from contextlib import suppress
 from rest_framework.permissions import BasePermission
 from ..models import Board
 from ..utils.decorators import false_on_exception

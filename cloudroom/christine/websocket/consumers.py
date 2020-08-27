@@ -36,7 +36,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
             await self.__handle_message(message=message)
             await self.__process_message(message=message)
-        else: self.disconnect()
+        else:
+            self.disconnect()
 
     async def chat_message(self, event):
         await self.send_json(content={
@@ -59,17 +60,19 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             if not self.stage:
                 self.stage = self.engine.process(text=message)
                 data = next(self.stage)
-            else: data = self.stage.send(message)
-            if 'result' in data: 
+            else:
+                data = self.stage.send(message)
+            if 'result' in data:
                 self.stage = None
                 data = data['result']
-            else: data = data['request']
+            else:
+                data = data['request']
             await self.__handle_message(
-                message=data.get('speak', 'Done!'), 
+                message=data.get('speak', 'Done!'),
                 from_chris=True,
                 type=(
-                    ChristineResponse.CommandType.REQUEST 
-                    if self.stage 
+                    ChristineResponse.CommandType.REQUEST
+                    if self.stage
                     else ChristineResponse.CommandType.RESULT
                 ),
                 **data
@@ -78,7 +81,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             response = f'Sorry, an error has occured: {e}'
             self.stage = None
             await self.__handle_message(
-                message=response, 
+                message=response,
                 from_chris=True,
                 type=ChristineResponse.CommandType.ERROR
             )
@@ -90,7 +93,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             **data
         )
         await self.__send_group_message(
-            message=data['message'], 
+            message=data['message'],
             from_chris=from_chris,
         )
 
@@ -98,7 +101,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     def __persist_message(self, from_chris, user, **data):
         if from_chris:
             ChristineResponse.objects.create(
-                text=data['message'], 
+                text=data['message'],
                 message=self.last_message,
                 command_type=data.pop('type'),
                 content=data,

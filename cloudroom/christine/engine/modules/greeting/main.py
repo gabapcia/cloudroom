@@ -8,11 +8,13 @@ def process(**kwargs) -> Dict[str, Any]:
 
 
 if __name__ == "__main__":
-    import os, json
+    import os
+    import json
     path = os.path.join(
-        os.getcwd(), 
-        'config', 
+        os.getcwd(),
+        'config',
         'commands.json'
     )
-    with open(path, 'rb') as f: config = json.load(f)
+    with open(path, 'rb') as f:
+        config = json.load(f)
     process(config=config)

@@ -7,10 +7,11 @@ class CorreiosInfoSerializer(serializers.ModelSerializer):
         model = models.CorreiosInfo
         fields = '__all__'
 
+
 class CorreiosSerializer(serializers.ModelSerializer):
     details = CorreiosInfoSerializer(
-        read_only=True, 
-        many=True, 
+        read_only=True,
+        many=True,
         source='correiosinfo_set'
     )
 

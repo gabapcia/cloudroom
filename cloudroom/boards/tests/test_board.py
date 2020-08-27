@@ -20,9 +20,9 @@ class TestsBoard(BaseBoardTests):
             response = client.get(url(kwargs={}))
         except NoReverseMatch:
             response = client.get(url(kwargs={'pk': board[0]['id']}))
-    
+
         assert response.status_code == 403
-    
+
     @pytest.mark.parametrize('url', URLS)
     def test_admin_access(self, admin_client, url, board):
         try:

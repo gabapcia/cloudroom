@@ -26,7 +26,7 @@ class TestCorreios:
             response = client.get(url(kwargs={}))
         except NoReverseMatch:
             response = client.get(url(kwargs={'pk': order['id']}))
-    
+
         assert response.status_code == 403
 
     @pytest.mark.parametrize('url', URLS)

@@ -9,8 +9,9 @@ from .scrapers import exceptions as tracking_exceptions
 def manage_deliveries():
     pending_orders = models.Correios.objects.filter(delivered=False)
 
-    if not pending_orders: return
-    
+    if not pending_orders:
+        return
+
     for order in pending_orders.iterator():
         try:
             result, need_cpf = correios.delivery_info(code=order.code)
@@ -54,8 +55,9 @@ def manage_deliveries():
                     description=info['Info']['Description']
                 )
 
+
 @task(
-    autoretry_for=(exceptions.MailError,), 
+    autoretry_for=(exceptions.MailError,),
     retry_backoff=True,
     retry_backoff_max=300,
     max_retries=5

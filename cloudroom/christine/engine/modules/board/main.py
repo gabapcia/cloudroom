@@ -14,6 +14,7 @@ def _get_value(words: List[str], target: str) -> str:
     except ValueError:
         return ''
 
+
 def _get_pin(phrase: str, command: str) -> Dict[str, Any]:
     words = phrase.split()
     pin = words[words.index('pin') + 1]
@@ -21,6 +22,7 @@ def _get_pin(phrase: str, command: str) -> Dict[str, Any]:
         'command': command,
         'pin': pin,
     }
+
 
 def _action_add(phrase: str) -> Dict[str, Any]:
     params_label = ['as', 'value', 'name', 'mode']
@@ -37,13 +39,15 @@ def _action_add(phrase: str) -> Dict[str, Any]:
                         idx = curr_idx
             if idx > len(words):
                 name = ' '.join([
-                    w for w in words[i + 1:] \
-                        if porter.stem(w) not in stopwords.words('english')
+                    w
+                    for w in words[i + 1:]
+                    if porter.stem(w) not in stopwords.words('english')
                 ])
             else:
                 name = ' '.join([
-                    w for w in words[i + 1:idx] \
-                        if porter.stem(w) not in stopwords.words('english')
+                    w
+                    for w in words[i + 1:idx]
+                    if porter.stem(w) not in stopwords.words('english')
                 ])
             break
     action = _get_pin(command='add', phrase=phrase)
@@ -54,6 +58,7 @@ def _action_add(phrase: str) -> Dict[str, Any]:
     })
     return action
 
+
 def _action_set(phrase: str) -> Dict[str, Any]:
     words = phrase.split()
     if 'pin' in words:
@@ -61,12 +66,13 @@ def _action_set(phrase: str) -> Dict[str, Any]:
     else:
         porter = PorterStemmer()
         _words = [
-            word for word in words \
-                if (
-                    word != 'set' and
-                    not Word2Number.is_number(word) and
-                    porter.stem(word) not in stopwords.words('english')
-                )
+            word
+            for word in words
+            if (
+                word != 'set' and
+                not Word2Number.is_number(word) and
+                porter.stem(word) not in stopwords.words('english')
+            )
         ]
         pin = ' '.join(_words)
     return {
@@ -75,6 +81,7 @@ def _action_set(phrase: str) -> Dict[str, Any]:
         'value': _get_value(words=words, target='to'),
     }
 
+
 def _action_turn(phrase: str) -> Dict[str, Any]:
     words = phrase.split()
     if 'pin' in words:
@@ -82,28 +89,30 @@ def _action_turn(phrase: str) -> Dict[str, Any]:
     else:
         porter = PorterStemmer()
         _words = [
-            word for word in words \
-                if (
-                    word != 'turn' and
-                    porter.stem(word) not in stopwords.words('english')
-                )
+            word
+            for word in words
+            if (
+                word != 'turn' and
+                porter.stem(word) not in stopwords.words('english')
+            )
         ]
         pin = ' '.join(_words)
-    
+
     return {
         'command': 'turn',
         'pin': pin,
         'value': True if 'on' in words else False
     }
 
+
 def process(params: List[str], **kwargs) -> Dict[str, Any]:
     text = ' '.join(params)
     w2n = Word2Number()
     text_parsed = w2n.parse(text)
     command = text_parsed.split()[0]
-    
+
     if command not in VALID_COMMANDS:
-        raise InvalidCommand(command=command) 
+        raise InvalidCommand(command=command)
 
     return {
         'add': lambda: _action_add(phrase=text_parsed),

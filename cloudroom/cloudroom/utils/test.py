@@ -6,7 +6,7 @@ import pytest
 
 
 class BaseTests(ABC):
-    def _generate_random_string(self, size: int=15):
+    def _generate_random_string(self, size: int = 15):
         return ''.join(choice(ascii_letters) for _ in range(size))
 
     @pytest.fixture
@@ -16,14 +16,13 @@ class BaseTests(ABC):
                 'username': username or self._generate_random_string(),
                 'password': password or self._generate_random_string(),
             }
-            user = (
+            if not admin:
                 django_user_model.objects.create_user(**user_data)
-                if not admin
-                else django_user_model.objects.create_admin_user(**user_data)
-            )
+            else:
+                django_user_model.objects.create_admin_user(**user_data)
 
             return user_data
-        
+
         return create
 
     @pytest.fixture
@@ -43,5 +42,5 @@ class BaseTests(ABC):
             assert 'user' in response_data
 
             return response
-        
+
         return do_login

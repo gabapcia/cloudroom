@@ -1,4 +1,8 @@
-import os, json, nltk, string, random
+import os
+import json
+import string
+import random
+import nltk
 from importlib import import_module
 from typing import Dict, Any, List, Callable, Generator
 from . import modules
@@ -10,7 +14,7 @@ nltk.download('stopwords')
 class Engine:
     APOLOGY_MESSAGES = ["Sorry, I didn't understant."]
 
-    def __init__(self, *, config_dir: str=None):
+    def __init__(self, *, config_dir: str = None):
         self.config_dir = config_dir or os.getenv(
             'CHRISTINE_CONFIG_PATH',
             os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config')
@@ -19,12 +23,13 @@ class Engine:
 
     def __get_config(self) -> Dict[str, Any]:
         path = os.path.join(self.config_dir, 'commands.json')
-        
-        with open(path, 'rb') as f: config = json.load(f)
-        
+
+        with open(path, 'rb') as f:
+            config = json.load(f)
+
         return config
 
-    def __get_process_method(self, module:str) -> Callable:
+    def __get_process_method(self, module:  str) -> Callable:
         try:
             module = import_module(f'{modules.__package__}.{module}.main')
         except ModuleNotFoundError:
@@ -32,26 +37,31 @@ class Engine:
 
         return module.process
 
-    def __parse_user_input(self, text:str, only_params:bool=False) -> List[Any]:
+    def __parse_user_input(
+        self,
+        text: str,
+        only_params: bool = False
+    ) -> List[Any]:
         tokens = [
-            word for word in nltk.word_tokenize(text.lower()) \
-                if word not in string.punctuation
+            word
+            for word in nltk.word_tokenize(text.lower())
+            if word not in string.punctuation
         ]
 
         return tokens if only_params else (tokens[0], tokens[1:])
 
-    def __get_module(self, activator:str) -> str:
+    def __get_module(self, activator: str) -> str:
         for module, configs in self.config.items():
             if activator in configs['activators']:
                 return module, configs['default']
 
         raise ActionNotFound(activator=activator)
 
-    def process(self, text:str) -> Generator:
+    def process(self, text: str) -> Generator:
         activator, params = self.__parse_user_input(text=text)
         try:
             module, default_messages = self.__get_module(activator=activator)
-        except ActionNotFound as e:
+        except ActionNotFound:
             yield {'result': {'speak': random.choice(Engine.APOLOGY_MESSAGES)}}
             return
 
