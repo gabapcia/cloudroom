@@ -10,7 +10,7 @@ class BoardPermission(BasePermission):
 
     @false_on_exception
     def has_permission(self, request, view):
-        if not (auth := request.headers.get('Authentication', '')):
+        if not (auth := request.headers.get('Authorization', '')):
             return False
 
         auth = base64.b64decode(auth.encode('ascii')).decode('ascii')

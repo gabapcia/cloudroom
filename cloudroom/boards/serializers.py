@@ -2,13 +2,13 @@ from rest_framework import serializers
 from . import models
 
 
-class PinSerializer(serializers.HyperlinkedModelSerializer):
+class PinSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Pin
         fields = '__all__'
         read_only_fields = ['created', 'updated']
 
-class BoardSerializer(serializers.HyperlinkedModelSerializer):
+class BoardSerializer(serializers.ModelSerializer):
     pins = serializers.HyperlinkedRelatedField(
         many=True, 
         read_only=True,

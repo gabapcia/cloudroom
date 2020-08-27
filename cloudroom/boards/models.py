@@ -1,7 +1,7 @@
 import argon2
 from django.db import models
 from django.core.validators import MinLengthValidator
-from .core.validators import validate_pin_value, validate_digital_pin
+from .core.validators import validate_pin_value
 
 
 class Board(models.Model):
@@ -49,10 +49,6 @@ class Pin(models.Model):
     def operation_info(self):
         return {'number': self.number, 'value': self.value}
 
-    def save(self, *args, **kwargs):
-        if self.is_digital: validate_digital_pin(value=self.value)
-        super().save(*args, **kwargs)
-
     class Meta:
         indexes = [
             models.Index(fields=['created']),
@@ -65,5 +61,12 @@ class Pin(models.Model):
             models.UniqueConstraint(
                 fields=['number', 'board'], 
                 name='pin_constraint'
+            ),
+            models.CheckConstraint(
+                check=(
+                    models.Q(value__regex=r'ON|OFF', is_digital=True) | 
+                    models.Q(value__regex=r'^\d+$', is_digital=False)
+                ),
+                name='pin_value_by_type',
             ),
         ]

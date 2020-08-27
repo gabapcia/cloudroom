@@ -1,9 +1,9 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from . import models, serializers
-from .core import permissions
+from .core.permissions import BoardPermission 
 
 
 class BoardViewSet(viewsets.ModelViewSet):
@@ -13,7 +13,7 @@ class BoardViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=['get'],
-        permission_classes=[IsAdminUser|permissions.BoardPermission],
+        permission_classes=[IsAuthenticated|BoardPermission],
     )
     def pins(self, request, pk):
         board = self.get_object()

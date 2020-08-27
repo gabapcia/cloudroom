@@ -10,11 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os, sys
+import os
 from pathlib import Path
 from celery.schedules import crontab
-from dotenv import load_dotenv
-load_dotenv()
+
 
 REDIS_URL = f'redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}'
 
@@ -115,6 +114,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'EXCEPTION_HANDLER': 'cloudroom.utils.handlers.handle_exceptions',
 }
 JWT_AUTH_REFRESH_COOKIE = 'cloudroom-refresh-auth'
 REST_SESSION_LOGIN = True

@@ -6,13 +6,15 @@ import pytest
 
 
 class BaseTests(ABC):
+    def _generate_random_string(self, size: int=15):
+        return ''.join(choice(ascii_letters) for _ in range(size))
+
     @pytest.fixture
     def create_user(self, django_user_model):
         def create(username=None, password=None, admin=False):
-            gen = lambda: ''.join(choice(ascii_letters) for _ in range(15))
             user_data = {
-                'username': username or gen(),
-                'password': password or gen(),
+                'username': username or self._generate_random_string(),
+                'password': password or self._generate_random_string(),
             }
             user = (
                 django_user_model.objects.create_user(**user_data)

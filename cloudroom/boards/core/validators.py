@@ -12,10 +12,3 @@ def validate_pin_value(value, pin_mode=None):
             _('The value must be "ON", "OFF" or an integer from 0 to 255'),
             code='invalid',
         )
-
-def validate_digital_pin(value):
-    if not re.search(r'^(ON|OFF)$', value):
-        raise ValidationError(
-            _('The digital pin value must be "ON" or "OFF"'),
-            code='invalid',
-        )
