@@ -1,4 +1,5 @@
 import base64
+from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import BasePermission
 from ..models import Board
 from ..utils.decorators import false_on_exception
