@@ -15,9 +15,10 @@ class BoardSerializer(serializers.ModelSerializer):
         view_name='pin-detail',
         source='pin_set'
     )
-    status = serializers.ChoiceField(
+    status_display = serializers.ChoiceField(
         choices=models.Board.Status.choices,
         source='get_status_display',
+        read_only=True,
     )
 
     class Meta:

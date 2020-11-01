@@ -98,7 +98,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
-    'EXCEPTION_HANDLER': 'cloudroom.utils.handlers.handle_exceptions',
+    'EXCEPTION_HANDLER': 'cloudroom.handlers.handle_exceptions',
 }
 JWT_AUTH_REFRESH_COOKIE = 'cloudroom-refresh-auth'
 REST_SESSION_LOGIN = True
