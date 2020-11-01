@@ -6,16 +6,8 @@ djangorestframework-simplejwt
 psycopg2-binary
 celery
 redis
-requests
-beautifulsoup4
-sendgrid
-argon2-cffi
-fuzzywuzzy
-channels
-channels_redis
 daphne
-python-Levenshtein
-nltk
 
 # Optional
 ipython
+python-dotenv
