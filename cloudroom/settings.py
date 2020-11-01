@@ -54,10 +54,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'channels',
-    'boards',
+    'microcontrollers',
     'orders',
-    'christine',
 ]
 
 MIDDLEWARE = [
@@ -89,15 +87,7 @@ TEMPLATES = [
     },
 ]
 
-ASGI_APPLICATION = 'cloudroom.routing.application'
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [(os.getenv('REDIS_HOST'), os.getenv('REDIS_PORT'))],
-        },
-    },
-}
+ASGI_APPLICATION = 'cloudroom.asgi.application'
 
 # CORS configuration
 CORS_ORIGIN_ALLOW_ALL = True

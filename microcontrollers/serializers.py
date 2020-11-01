@@ -6,7 +6,6 @@ class PinSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Pin
         fields = '__all__'
-        read_only_fields = ['created', 'updated']
 
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -16,14 +15,9 @@ class BoardSerializer(serializers.ModelSerializer):
         view_name='pin-detail',
         source='pin_set'
     )
-    password = serializers.CharField(
-        write_only=True,
-        style={'input_type': 'password'}
-    )
-    status_display = serializers.ChoiceField(
+    status = serializers.ChoiceField(
         choices=models.Board.Status.choices,
         source='get_status_display',
-        read_only=True
     )
 
     class Meta:
