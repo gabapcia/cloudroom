@@ -20,12 +20,7 @@ REDIS_URL = f'redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}'
 # Celery variables
 CELERY_BROKER_URL = REDIS_URL
 CELERY_TIMEZONE = 'America/Sao_Paulo'
-CELERY_BEAT_SCHEDULE = {
-    'Track orders': {
-        'task': 'orders.tasks.manage_deliveries',
-        'schedule': crontab(minute='*/5'),
-    },
-}
+CELERY_BEAT_SCHEDULE = {}
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)

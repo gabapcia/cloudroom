@@ -1,6 +1,6 @@
-FROM python:3-buster
+FROM python:3.9-slim
 
-WORKDIR /var/app
+WORKDIR /opt/app
 
 RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y --no-install-recommends g++ netcat

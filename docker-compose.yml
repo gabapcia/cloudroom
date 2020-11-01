@@ -5,7 +5,7 @@ services:
     image: postgres:12-alpine
     container_name: postgres
     restart: unless-stopped
-    env_file: ./cloudroom/.env
+    env_file: ./.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     expose:
@@ -19,42 +19,42 @@ services:
     expose:
       - 6379
   django:
-    build: ./cloudroom
+    build: .
     container_name: django
     volumes: 
-      - ./cloudroom:/var/app
-      - static_files:/var/app/static
-      - media_files:/var/app/media
-    env_file: ./cloudroom/.env
+      - ./:/opt/app
+      - static_files:/opt/app/static
+      - media_files:/opt/app/media
+    env_file: ./.env
     restart: unless-stopped
     command: [./manage.py, runserver, 0.0.0.0:8000]
-    entrypoint: [/var/app/entrypoint.sh]
+    entrypoint: [/opt/app/entrypoint.sh]
     ports: 
       - 8000:8000
     depends_on: 
       - postgres
       - redis
   celery_worker:
-    build: ./cloudroom
+    build: .
     container_name: celery_worker
     volumes: 
-      - ./cloudroom:/var/app
-      - static_files:/var/app/static
-      - media_files:/var/app/media
-    env_file: ./cloudroom/.env
+      - ./:/opt/app
+      - static_files:/opt/app/static
+      - media_files:/opt/app/media
+    env_file: ./.env
     restart: unless-stopped
     command: [celery, -A, cloudroom, worker, -l, INFO]
     depends_on: 
       - postgres
       - redis
   celery_beat:
-    build: ./cloudroom
+    build: .
     container_name: celery_beat
     volumes: 
-      - ./cloudroom:/var/app
-      - static_files:/var/app/static
-      - media_files:/var/app/media
-    env_file: ./cloudroom/.env
+      - ./:/opt/app
+      - static_files:/opt/app/static
+      - media_files:/opt/app/media
+    env_file: ./.env
     restart: unless-stopped
     command: [celery, -A, cloudroom, beat, -l, INFO]
     depends_on: 
