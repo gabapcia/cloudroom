@@ -3,11 +3,10 @@ from contextlib import suppress
 import pytest
 from django.urls import reverse
 from django.db.transaction import TransactionManagementError
-from cloudroom.testing import BaseTest
 from ..models import Board, Pin
 
 
-class BaseMicrocontrollerTest(BaseTest, ABC):
+class BaseMicrocontrollerTest(ABC):
     @pytest.fixture
     def board_data(self, faker):
         def generate_data(**overwrite):
