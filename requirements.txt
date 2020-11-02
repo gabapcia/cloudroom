@@ -1,12 +1,15 @@
 django
 djangorestframework
 django-cors-headers
-pytest-django
 djangorestframework-simplejwt
 psycopg2-binary
 celery
 redis
 daphne
+
+# Testing Deps
+pytest-django
+faker
 
 # Optional
 ipython
