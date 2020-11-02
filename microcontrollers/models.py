@@ -33,7 +33,7 @@ class Pin(models.Model):
     number = models.PositiveIntegerField()
     value = models.CharField(max_length=4)
     is_digital = models.BooleanField(default=True)
-    description = models.CharField(max_length=512, null=True)
+    description = models.CharField(max_length=512, null=True, blank=True)
 
     class Meta:
         indexes = [

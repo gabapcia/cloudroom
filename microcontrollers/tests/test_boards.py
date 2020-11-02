@@ -92,3 +92,14 @@ class TestBoards(BaseMicrocontrollerTest):
             content_type='application/json',
         )
         assert resp.status_code == 400
+
+    def test_board_with_repeated_name(self, admin_client, board):
+        data = board[1]
+        list_url = TestBoards.list_url()
+
+        resp = admin_client.post(
+            list_url,
+            data,
+            content_type='application/json',
+        )
+        assert resp.status_code == 400

@@ -1,6 +1,8 @@
 from abc import ABC
+from contextlib import suppress
 import pytest
 from django.urls import reverse
+from django.db.transaction import TransactionManagementError
 from cloudroom.testing import BaseTest
 from ..models import Board, Pin
 
@@ -25,16 +27,19 @@ class BaseMicrocontrollerTest(BaseTest, ABC):
 
         yield board, data
 
-        board.delete()
+        with suppress(TransactionManagementError):
+            board.delete()
 
     @pytest.fixture
-    def pin_data(self, board):
-        def generate_data(digital=True, **override):
+    def pin_data(self, faker, board):
+        def generate_data(is_digital=True, **override):
+            value = 'ON' if is_digital else str(faker.random_int(max=1024))
+
             data = {
                 'board': board[0].pk,
-                'number': 1,
-                'value': 'ON' if digital else '255',
-                'is_digital': digital,
+                'number': faker.unique.random_int(max=55),
+                'value': value,
+                'is_digital': is_digital,
                 'description': 'Test Pin',
             }
             data.update(override)
@@ -45,9 +50,12 @@ class BaseMicrocontrollerTest(BaseTest, ABC):
     @pytest.fixture
     def pin(self, db, pin_data):
         data = pin_data()
-        data['board'] = Board.objects.get(pk=data['board'])
-        pin = Pin.objects.create(**data)
+        pin = Pin.objects.create(**{
+            **data,
+            'board': Board.objects.get(pk=data['board']),
+        })
 
         yield pin, data
 
-        pin.delete()
+        with suppress(TransactionManagementError):
+            pin.delete()
