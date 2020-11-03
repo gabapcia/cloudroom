@@ -1,0 +1,41 @@
+version: "3.8"
+
+services: 
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+    expose:
+      - 5432
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    expose:
+      - 6379
+  django:
+    build: .
+    container_name: django
+    environment:
+      - DJANGO_SECRET
+      - DJANGO_DEBUG
+      - DJANGO_ALLOWED_HOSTS
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+      - POSTGRES_PORT
+      - REDIS_HOST
+      - REDIS_PORT
+    restart: unless-stopped
+    command: [./manage.py, runserver, 0.0.0.0:8000]
+    entrypoint: [/opt/app/entrypoint.sh]
+    expose:
+      - 8000
+    depends_on: 
+      - postgres
+      - redis

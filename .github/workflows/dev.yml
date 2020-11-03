@@ -1,0 +1,31 @@
+name: CI
+
+on: [push]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SECRET: ${{ secrets.DJANGO_SECRET }}
+      DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
+      DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build the docker-compose stack
+      run: docker-compose -f docker-compose.ci.yml up -d
+    - name: Check running containers
+      run: docker ps -a
+    - name: Check logs
+      run: docker logs django
+    - name: Run test suite
+      run: docker exec django pytest --skip-auth
