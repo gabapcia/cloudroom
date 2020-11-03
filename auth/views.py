@@ -37,7 +37,11 @@ class TokenCookieRefreshView(TokenViewBase):
     serializer_class = TokenRefreshSerializer
 
     def post(self, request, *args, **kwargs):
-        data = request.data.dict()
+        if type(request.data) is not dict:
+            data = request.data.dict()
+        else:
+            data = request.data
+
         if not data.get('refresh', None):
             data['refresh'] = request.COOKIES.get(
                 settings.JWT_AUTH_REFRESH_COOKIE,
