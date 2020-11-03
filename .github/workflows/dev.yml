@@ -28,4 +28,4 @@ jobs:
     - name: Check logs
       run: docker logs django
     - name: Run test suite
-      run: docker exec django pytest --skip-auth
+      run: docker exec django pytest
