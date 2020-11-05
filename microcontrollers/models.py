@@ -1,3 +1,10 @@
+from argon2 import PasswordHasher
+from argon2.exceptions import (
+    HashingError,
+    VerificationError,
+    VerifyMismatchError,
+)
+from .exceptions import HashSecretError
 from django.db import models
 from django.core.validators import MinLengthValidator
 
@@ -12,7 +19,39 @@ class Board(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     name = models.CharField(max_length=15, unique=True)
-    status = models.IntegerField(choices=Status.choices)
+    secret = models.CharField(max_length=255)
+    status = models.IntegerField(
+        choices=Status.choices,
+        default=Status.DEACTIVATED,
+    )
+
+    def hash_secret(self, secret: str) -> str:
+        ph = PasswordHasher()
+        try:
+            hash = ph.hash(secret)
+        except HashingError:
+            raise HashSecretError
+
+        return hash
+
+    def verify_secret(self, secret: str) -> bool:
+        ph = PasswordHasher()
+        try:
+            ph.verify(self.secret, secret)
+        except VerifyMismatchError:
+            return False
+
+        if ph.check_needs_rehash(self.secret):
+            self.secret = self.hash_secret(secret=secret)
+            self.save()
+
+        return True
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.secret = self.hash_secret(secret=self.secret)
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Board ID: #{self.pk} - {self.name}'
@@ -34,6 +73,13 @@ class Pin(models.Model):
     value = models.CharField(max_length=4)
     is_digital = models.BooleanField(default=True)
     description = models.CharField(max_length=512, null=True, blank=True)
+
+    def basic_info(self) -> dict:
+        return {
+            'number': self.number,
+            'value': self.value,
+            'is_digital': self.is_digital,
+        }
 
     class Meta:
         indexes = [

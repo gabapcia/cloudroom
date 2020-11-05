@@ -103,3 +103,30 @@ class TestBoards(BaseMicrocontrollerTest):
             content_type='application/json',
         )
         assert resp.status_code == 400
+
+    def test_change_board_name(self, admin_client, board):
+        pk = board[0].pk
+        name = board[0].name
+
+        detail_url = TestBoards.detail_url(pk=pk)
+        data = admin_client.get(
+            detail_url,
+            content_type='application/json'
+        ).json()
+        data.update(board[1])
+
+        resp = admin_client.put(
+            detail_url,
+            {**data, 'name': 'random name'},
+            content_type='application/json',
+        )
+        assert resp.status_code == 200
+        assert resp.json()['name'] == data['name']
+
+        resp = admin_client.patch(
+            detail_url,
+            {'name': 'random name'},
+            content_type='application/json',
+        )
+        assert resp.status_code == 200
+        assert resp.json()['name'] == data['name']

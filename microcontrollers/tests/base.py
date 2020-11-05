@@ -1,5 +1,6 @@
 from abc import ABC
 from contextlib import suppress
+from random import shuffle
 import pytest
 from django.urls import reverse
 from django.db.transaction import TransactionManagementError
@@ -10,8 +11,12 @@ class BaseMicrocontrollerTest(ABC):
     @pytest.fixture
     def board_data(self, faker):
         def generate_data(**overwrite):
+            secret = list(''.join(faker.address().split()))
+            shuffle(secret)
+
             data = {
                 'name': f'Test #{faker.unique.random_int(max=10000)}',
+                'secret': ''.join(secret),
                 'status': Board.Status.ACTIVATED,
             }
             data.update(overwrite)

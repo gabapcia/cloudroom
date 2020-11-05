@@ -6,6 +6,7 @@ psycopg2-binary
 celery
 redis
 daphne
+argon2-cffi
 
 # Testing Deps
 pytest-django

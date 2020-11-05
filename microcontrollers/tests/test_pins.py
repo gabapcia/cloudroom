@@ -134,3 +134,107 @@ class TestPins(BaseMicrocontrollerTest):
             content_type='application/json',
         )
         assert resp.status_code == 400
+
+    def test_change_pin_number(self, admin_client, pin):
+        pk = pin[0].pk
+        number = pin[0].number
+
+        detail_url = TestPins.detail_url(pk=pk)
+        data = admin_client.get(
+            detail_url,
+            content_type='application/json'
+        ).json()
+        data.update(pin[1])
+
+        resp = admin_client.put(
+            detail_url,
+            {**data, 'number': number + 1},
+            content_type='application/json',
+        )
+        assert resp.status_code == 200
+        assert resp.json()['number'] == data['number']
+
+        resp = admin_client.patch(
+            detail_url,
+            {'number': number + 1},
+            content_type='application/json',
+        )
+        assert resp.status_code == 200
+        assert resp.json()['number'] == data['number']
+
+    def test_change_pin_board(self, admin_client, pin):
+        pk = pin[0].pk
+        board = pin[0].board.pk
+
+        detail_url = TestPins.detail_url(pk=pk)
+        data = admin_client.get(
+            detail_url,
+            content_type='application/json'
+        ).json()
+        data.update(pin[1])
+
+        resp = admin_client.put(
+            detail_url,
+            {**data, 'board': board + 1},
+            content_type='application/json',
+        )
+        assert resp.status_code == 200
+        assert resp.json()['board'] == data['board']
+
+        resp = admin_client.patch(
+            detail_url,
+            {'board': board + 1},
+            content_type='application/json',
+        )
+        assert resp.status_code == 200
+        assert resp.json()['board'] == data['board']
+
+    def test_change_pin_value_without_type(self, admin_client, pin):
+        pk = pin[0].pk
+        if pin[0].is_digital:
+            value = 'OFF' if pin[0].value == 'ON' else 'ON'
+        else:
+            value = ''.join(reversed(pin[0].value))
+
+        detail_url = TestPins.detail_url(pk=pk)
+        data = admin_client.get(
+            detail_url,
+            content_type='application/json'
+        ).json()
+        data.update(pin[1])
+
+        resp = admin_client.put(
+            detail_url,
+            {'value': value},
+            content_type='application/json',
+        )
+        assert resp.status_code == 400
+
+        resp = admin_client.patch(
+            detail_url,
+            {'value': value},
+            content_type='application/json',
+        )
+        assert resp.status_code == 400
+
+    def test_change_pin_type_without_value(self, admin_client, pin):
+        detail_url = TestPins.detail_url(pk=pin[0].pk)
+        data = admin_client.get(
+            detail_url,
+            content_type='application/json'
+        ).json()
+        data.update(pin[1])
+
+        resp = admin_client.put(
+            detail_url,
+            {**data, 'is_digital': not data['is_digital']},
+            content_type='application/json',
+        )
+        assert resp.status_code == 400
+
+        resp = admin_client.patch(
+            detail_url,
+            {'is_digital': not data['is_digital']},
+            content_type='application/json',
+        )
+        assert resp.status_code == 400

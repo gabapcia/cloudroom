@@ -1,0 +1,2 @@
+class HashSecretError(Exception):
+    pass
