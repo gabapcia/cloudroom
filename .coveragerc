@@ -1,0 +1,7 @@
+[run]
+omit = 
+    */tests/*
+    cloudroom/*
+    */serializers.py
+    */utils.py
+    */models.py

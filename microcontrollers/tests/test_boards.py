@@ -1,3 +1,4 @@
+import base64
 import pytest
 from django.urls import reverse
 from ..models import Board
@@ -7,10 +8,12 @@ from .base import BaseMicrocontrollerTest
 class TestBoards(BaseMicrocontrollerTest):
     list_url = lambda: reverse('board-list')
     detail_url = lambda pk: reverse('board-detail', kwargs={'pk': pk})
+    pins_url = lambda pk: reverse('board-pins', kwargs={'pk': pk})
 
     def test_unauthenticated_access(self, client, board, board_data):
         list_url = TestBoards.list_url()
         detail_url = TestBoards.detail_url(pk=board[0].pk)
+        pins_url = TestBoards.pins_url(pk=board[0].pk)
 
         resp = client.get(list_url)
         assert resp.status_code == 403
@@ -38,6 +41,9 @@ class TestBoards(BaseMicrocontrollerTest):
         resp = client.delete(detail_url)
         assert resp.status_code == 403
 
+        resp = client.get(pins_url)
+        assert resp.status_code == 403
+
     def test_authenticated_access(self, admin_client, board_data):
         list_url = TestBoards.list_url()
 
@@ -49,7 +55,8 @@ class TestBoards(BaseMicrocontrollerTest):
         resp = admin_client.post(list_url, data)
         assert resp.status_code == 201
 
-        detail_url = TestBoards.detail_url(pk=resp.json()['id'])
+        pk = resp.json()['id']
+        detail_url = TestBoards.detail_url(pk=pk)
 
         resp = admin_client.get(detail_url)
         assert resp.status_code == 200
@@ -66,6 +73,10 @@ class TestBoards(BaseMicrocontrollerTest):
             {'status': Board.Status.BLOCKED.value},
             content_type='application/json',
         )
+        assert resp.status_code == 200
+
+        pins_url = TestBoards.pins_url(pk=pk)
+        resp = admin_client.get(pins_url)
         assert resp.status_code == 200
 
         resp = admin_client.delete(detail_url)
@@ -130,3 +141,12 @@ class TestBoards(BaseMicrocontrollerTest):
         )
         assert resp.status_code == 200
         assert resp.json()['name'] == data['name']
+
+    def test_board_pins_route_as_board(self, client, board):
+        pk = board[0].pk
+        secret = board[1]['secret']
+
+        pins_url = TestBoards.pins_url(pk=pk)
+        auth = base64.b64encode(f'{pk}{secret}'.encode()).decode()
+        resp = client.get(pins_url, HTTP_AUTHORIZATION=auth)
+        assert resp.status_code == 200

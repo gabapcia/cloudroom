@@ -18,7 +18,9 @@ services:
     expose:
       - 6379
   django:
-    build: .
+    build:
+      context: .
+      target: django
     container_name: django
     environment:
       - DJANGO_SECRET
@@ -32,10 +34,6 @@ services:
       - REDIS_HOST
       - REDIS_PORT
     restart: unless-stopped
-    command: [./manage.py, runserver, 0.0.0.0:8000]
-    entrypoint: [/opt/app/entrypoint.sh]
-    expose:
-      - 8000
     depends_on: 
       - postgres
       - redis

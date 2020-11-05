@@ -19,7 +19,9 @@ services:
     expose:
       - 6379
   django:
-    build: .
+    build:
+      context: .
+      target: django
     container_name: django
     volumes: 
       - ./:/opt/app
@@ -27,15 +29,15 @@ services:
       - media_files:/opt/app/media
     env_file: ./.env
     restart: unless-stopped
-    command: [./manage.py, runserver, 0.0.0.0:8000]
-    entrypoint: [/opt/app/entrypoint.sh]
     ports: 
       - 8000:8000
     depends_on: 
       - postgres
       - redis
   celery_worker:
-    build: .
+    build:
+      context: .
+      target: base
     container_name: celery_worker
     volumes: 
       - ./:/opt/app
@@ -48,7 +50,9 @@ services:
       - postgres
       - redis
   celery_beat:
-    build: .
+    build:
+      context: .
+      target: base
     container_name: celery_beat
     volumes: 
       - ./:/opt/app

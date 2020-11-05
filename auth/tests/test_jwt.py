@@ -1,3 +1,4 @@
+import pytest
 from django.conf import settings
 from django.urls import reverse
 from .base import BaseAuthTests
@@ -9,21 +10,25 @@ class TestJWT(BaseAuthTests):
     logout_url = reverse('logout')
     user_detail_url = reverse('user-detail')
 
-    def login(self, client, user_data):
+    def login(self, client, user_data, use_email=False):
+        data = {'password': user_data['password']}
+        if use_email:
+            data['email'] = user_data['email']
+        else:
+            data['username'] = user_data['username']
+
         return client.post(
             TestJWT.login_url,
-            {
-                'username': user_data['username'],
-                'password': user_data['password']
-            },
+            data,
             content_type='application/json',
         )
 
     def logout(self, client):
         return client.post(TestJWT.logout_url, content_type='application/json')
 
-    def test_login(self, user, client):
-        resp = self.login(client=client, user_data=user[1])
+    @pytest.mark.parametrize('use_email', [True, False])
+    def test_login(self, user, client, use_email):
+        resp = self.login(client=client, user_data=user[1], use_email=use_email)
         assert resp.status_code == 200
 
         assert settings.JWT_AUTH_REFRESH_COOKIE in resp.cookies
@@ -33,6 +38,11 @@ class TestJWT(BaseAuthTests):
         assert 'access' in resp_data
         assert 'refresh' in resp_data
         assert 'user' in resp_data
+
+    def test_login_without_credentials(self, user, client):
+        login_url = TestJWT.login_url
+        resp = client.post(login_url, {}, content_type='application/json')
+        assert resp.status_code == 400
 
     def test_logout(self, user, client):
         self.login(client=client, user_data=user[1])

@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.9-slim as base
 
 WORKDIR /opt/app
 
@@ -11,3 +11,9 @@ RUN pip install -U pip
 RUN pip install -Ur requirements.txt
 
 COPY . .
+
+
+FROM base AS django
+ENTRYPOINT [ "./entrypoint.sh" ]
+EXPOSE 8000
+CMD ["./manage.py", "runserver", "0.0.0.0:8000"]

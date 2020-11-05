@@ -15,7 +15,7 @@ class BoardPermission(BasePermission):
             return False
 
         auth = base64.b64decode(auth.encode('utf-8')).decode('utf-8')
-        id, secret = auth[0], auth[1:] 
+        id, secret = auth[0], auth[1:]
 
         board = Board.objects.get(pk=id)
 
