@@ -8,7 +8,6 @@ from .permissions import BoardPermission
 
 class BoardViewSet(ModelViewSet):
     queryset = models.Board.objects.all()
-    serializer_class = serializers.BoardSerializer
 
     def get_serializer_class(self):
         if self.action in ['update', 'partial_update']:

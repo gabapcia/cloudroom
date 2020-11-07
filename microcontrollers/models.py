@@ -4,9 +4,10 @@ from argon2.exceptions import (
     VerificationError,
     VerifyMismatchError,
 )
-from .exceptions import HashSecretError
 from django.db import models
 from django.core.validators import MinLengthValidator
+from .exceptions import HashSecretError
+from .validators import validate_pin_value
 
 
 class Board(models.Model):
@@ -70,7 +71,7 @@ class Pin(models.Model):
 
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
     number = models.PositiveIntegerField()
-    value = models.CharField(max_length=4)
+    value = models.CharField(max_length=4, validators=[validate_pin_value])
     is_digital = models.BooleanField(default=True)
     description = models.CharField(max_length=512, null=True, blank=True)
 

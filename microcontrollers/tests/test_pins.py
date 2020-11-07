@@ -65,6 +65,7 @@ class TestPins(BaseMicrocontrollerTest):
             {'is_digital': False, 'value': '255'},
             content_type='application/json',
         )
+        print(resp.json())
         assert resp.status_code == 200
 
         resp = admin_client.delete(detail_url)
@@ -235,6 +236,33 @@ class TestPins(BaseMicrocontrollerTest):
         resp = admin_client.patch(
             detail_url,
             {'is_digital': not data['is_digital']},
+            content_type='application/json',
+        )
+        assert resp.status_code == 400
+
+    def test_create_pin_with_value_gt_1023(self, admin_client, pin_data):
+        list_url = TestPins.list_url()
+
+        resp = admin_client.post(
+            list_url,
+            pin_data(is_digital=False, value=1024),
+            content_type='application/json',
+        )
+        assert resp.status_code == 400
+
+    def test_update_pin_with_value_gt_1023(self, admin_client, pin):
+        detail_url = TestPins.detail_url(pk=pin[0].pk)
+
+        resp = admin_client.put(
+            detail_url,
+            {**pin[1], 'is_digital': False, 'value': 1024},
+            content_type='application/json',
+        )
+        assert resp.status_code == 400
+
+        resp = admin_client.patch(
+            detail_url,
+            {'is_digital': False, 'value': 1024},
             content_type='application/json',
         )
         assert resp.status_code == 400

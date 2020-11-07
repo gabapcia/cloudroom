@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from . import models
 
 
-class PinSerializer(serializers.ModelSerializer):    
+class PinSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if 'value' in data and 'is_digital' not in data:
             raise ValidationError(
@@ -22,6 +22,10 @@ class PinSerializer(serializers.ModelSerializer):
             else:
                 if not re.search(r'^\d{1,4}$', data['value']):
                     raise ValidationError('Invalid value for a non digital pin')
+                elif int(data['value']) > 1023 or int(data['value']) < 0:
+                    raise ValidationError(
+                        'Pin value must be between 0 and 1023'
+                    )
 
         return data
 
@@ -38,7 +42,7 @@ class PinSerializer(serializers.ModelSerializer):
 
 class UpdatePinSerializer(PinSerializer):
     def to_representation(self, instance):
-        return PinSerializer(instance).data
+        return PinSerializer(instance, context=self.context).data
 
     class Meta:
         model = models.Pin
@@ -66,14 +70,14 @@ class BoardSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'secret': {
                 'write_only': True,
-                'style': {'input_type': 'password'}
+                'style': {'input_type': 'password'},
             }
         }
 
 
 class UpdateBoardSerializer(BoardSerializer):
     def to_representation(self, instance):
-        return BoardSerializer(instance).data
+        return BoardSerializer(instance, context=self.context).data
 
     class Meta:
         model = models.Board

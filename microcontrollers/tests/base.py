@@ -37,7 +37,7 @@ class BaseMicrocontrollerTest(ABC):
     @pytest.fixture
     def pin_data(self, faker, board):
         def generate_data(is_digital=True, **override):
-            value = 'ON' if is_digital else str(faker.random_int(max=1024))
+            value = 'ON' if is_digital else str(faker.random_int(max=1023))
 
             data = {
                 'board': board[0].pk,
