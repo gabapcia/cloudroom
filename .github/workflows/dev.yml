@@ -3,9 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-
-  build:
-
+  pytest:
     runs-on: ubuntu-latest
     env:
       DJANGO_SECRET: ${{ secrets.DJANGO_SECRET }}
@@ -33,4 +31,13 @@ jobs:
     - name: Check logs
       run: docker logs django
     - name: Run test suite
-      run: docker exec django pytest --cov
+      run: docker exec django pytest --cov --cov-report xml
+
+    - name: Upload coverage to Codecov  
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true

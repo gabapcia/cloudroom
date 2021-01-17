@@ -39,6 +39,8 @@ services:
       - MQTT_BROKER_USERNAME
       - MQTT_BROKER_PASSWORD
     restart: unless-stopped
+    volumes:
+      - ./:/opt/app
     depends_on: 
       - postgres
       - redis
