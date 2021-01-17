@@ -8,6 +8,14 @@ from .base import BaseMicrocontrollerTest
 class TestBoards(BaseMicrocontrollerTest):
     list_url = lambda: reverse('board-list')
     detail_url = lambda pk: reverse('board-detail', kwargs={'pk': pk})
+    update_secret_url = lambda pk: reverse(
+        'board-generate-new-secret',
+        kwargs={'pk': pk},
+    )
+    validate_secret_url = lambda pk: reverse(
+        'board-validate-secret',
+        kwargs={'pk': pk},
+    )
     pins_url = lambda pk: reverse('board-pins', kwargs={'pk': pk})
 
     def test_unauthenticated_access(self, client, board, board_data):
@@ -142,11 +150,40 @@ class TestBoards(BaseMicrocontrollerTest):
         assert resp.status_code == 200
         assert resp.json()['name'] == data['name']
 
-    def test_board_pins_route_as_board(self, client, board):
+    def test_update_board_secret(self, admin_client, board):
         pk = board[0].pk
         secret = board[1]['secret']
 
-        pins_url = TestBoards.pins_url(pk=pk)
-        auth = base64.b64encode(f'{pk}{secret}'.encode()).decode()
-        resp = client.get(pins_url, HTTP_AUTHORIZATION=auth)
+        update_secret_url = TestBoards.update_secret_url(pk=pk)
+        resp = admin_client.patch(update_secret_url)
         assert resp.status_code == 200
+        new_secret = resp.json().get('secret')
+        assert new_secret is not None
+        assert new_secret != secret
+
+    def test_validate_board_secret(self, admin_client, board):
+        pk = board[0].pk
+        secret = board[1]['secret']
+
+        validate_secret_url = TestBoards.validate_secret_url(pk=pk)
+        resp = admin_client.post(
+            validate_secret_url,
+            {'secret': secret},
+            content_type='application/json',
+        )
+        assert resp.status_code == 204
+
+    def test_validate_old_secret(self, admin_client, board):
+        pk = board[0].pk
+        old_secret = board[1]['secret']
+
+        update_secret_url = TestBoards.update_secret_url(pk=pk)
+        admin_client.patch(update_secret_url)
+
+        validate_secret_url = TestBoards.validate_secret_url(pk=pk)
+        resp = admin_client.post(
+            validate_secret_url,
+            {'secret': old_secret},
+            content_type='application/json',
+        )
+        assert resp.status_code == 400

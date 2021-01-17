@@ -1,11 +1,6 @@
 from argon2 import PasswordHasher
-from argon2.exceptions import (
-    HashingError,
-    VerificationError,
-    VerifyMismatchError,
-)
+from argon2.exceptions import HashingError, VerifyMismatchError
 from django.db import models
-from django.core.validators import MinLengthValidator
 from .exceptions import HashSecretError
 from .validators import validate_pin_value
 
@@ -26,12 +21,12 @@ class Board(models.Model):
         default=Status.DEACTIVATED,
     )
 
-    def hash_secret(self, secret: str) -> str:
+    def _hash_secret(self, secret: str) -> str:
         ph = PasswordHasher()
         try:
             hash = ph.hash(secret)
-        except HashingError:
-            raise HashSecretError
+        except HashingError as e:
+            raise HashSecretError from e
 
         return hash
 
@@ -43,14 +38,19 @@ class Board(models.Model):
             return False
 
         if ph.check_needs_rehash(self.secret):
-            self.secret = self.hash_secret(secret=secret)
+            self.secret = self._hash_secret(secret=secret)
             self.save()
 
         return True
 
+    def update_secret(self, secret: str) -> None:
+        secret = self._hash_secret(secret)
+        self.secret = secret
+        self.save()
+
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.secret = self.hash_secret(secret=self.secret)
+            self.secret = self._hash_secret(secret=self.secret)
 
         super().save(*args, **kwargs)
 
@@ -70,6 +70,7 @@ class Pin(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    name = models.CharField(max_length=15)
     number = models.PositiveIntegerField()
     value = models.CharField(max_length=4, validators=[validate_pin_value])
     is_digital = models.BooleanField(default=True)
@@ -93,13 +94,17 @@ class Pin(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['number', 'board'],
-                name='pin_constraint'
+                name='unique pin number per board',
+            ),
+            models.UniqueConstraint(
+                fields=['name', 'board'],
+                name='Unique pin name per board',
             ),
             models.CheckConstraint(
                 check=(
                     models.Q(value__regex=r'^ON|OFF$', is_digital=True) |
                     models.Q(value__regex=r'^\d{1,4}$', is_digital=False)
                 ),
-                name='pin_value_by_type',
+                name='Check pin value by type',
             ),
         ]

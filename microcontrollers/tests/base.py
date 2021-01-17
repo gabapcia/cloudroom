@@ -2,7 +2,6 @@ from abc import ABC
 from contextlib import suppress
 from random import shuffle
 import pytest
-from django.urls import reverse
 from django.db.transaction import TransactionManagementError
 from ..models import Board, Pin
 
@@ -42,13 +41,14 @@ class BaseMicrocontrollerTest(ABC):
             data = {
                 'board': board[0].pk,
                 'number': faker.unique.random_int(max=55),
+                'name': f'Test #{faker.unique.random_int(max=10000)}',
                 'value': value,
                 'is_digital': is_digital,
                 'description': 'Test Pin',
             }
             data.update(override)
             return data
-        
+
         return generate_data
 
     @pytest.fixture
