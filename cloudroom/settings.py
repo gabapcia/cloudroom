@@ -15,7 +15,20 @@ from pathlib import Path
 from celery.schedules import crontab
 
 
-REDIS_URL = f'redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}'
+REDIS_URL = f'redis://{os.environ["REDIS_HOST"]}:{os.environ["REDIS_PORT"]}'
+
+
+# MQTT Configuration
+MQTT_BROKER_HOST = os.environ['MQTT_BROKER_HOST']
+MQTT_BROKER_MANAGEMENT_PORT = os.environ['MQTT_BROKER_MANAGEMENT_PORT']
+MQTT_BROKER_PORT = os.environ['MQTT_BROKER_PORT']
+MQTT_BROKER_USERNAME = os.environ['MQTT_BROKER_USERNAME']
+MQTT_BROKER_PASSWORD = os.environ['MQTT_BROKER_PASSWORD']
+MQTT_BROKER_MANAGEMENT_URL = 'http://{host}:{port}'.format(
+    host=MQTT_BROKER_HOST,
+    port=MQTT_BROKER_MANAGEMENT_PORT,
+)
+
 
 # Celery variables
 CELERY_BROKER_URL = REDIS_URL
@@ -30,12 +43,12 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret! 
-SECRET_KEY = os.getenv('DJANGO_SECRET')
+SECRET_KEY = os.environ['DJANGO_SECRET']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.getenv('DJANGO_DEBUG'))
+DEBUG = int(os.environ['DJANGO_DEBUG'])
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = os.environ['DJANGO_ALLOWED_HOSTS'].split(',')
 
 
 # Application definition
@@ -110,11 +123,11 @@ REST_SESSION_LOGIN = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'),
+        'NAME': os.environ['POSTGRES_DB'],
+        'USER': os.environ['POSTGRES_USER'],
+        'PASSWORD': os.environ['POSTGRES_PASSWORD'],
+        'HOST': os.environ['POSTGRES_HOST'],
+        'PORT': os.environ['POSTGRES_PORT'],
     }
 }
 
