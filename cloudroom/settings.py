@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from pathlib import Path
 from celery.schedules import crontab
-# from dotenv import load_dotenv
-# load_dotenv()
 
 
 REDIS_URL = f'redis://{os.getenv("REDIS_HOST")}:{os.getenv("REDIS_PORT")}'
@@ -37,7 +35,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.getenv('DJANGO_DEBUG'))
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS').split(' ')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS').split(',')
 
 
 # Application definition
@@ -102,7 +100,7 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'EXCEPTION_HANDLER': 'cloudroom.handlers.handle_exceptions',
 }
-JWT_AUTH_REFRESH_COOKIE = 'cloudroom-refresh-auth'
+JWT_AUTH_REFRESH_COOKIE = 'X-CloudRoom-Refresh'
 REST_SESSION_LOGIN = True
 
 

@@ -1,1 +1,0 @@
-## This app is based on [https://github.com/jazzband/dj-rest-auth](dj-rest-auth)

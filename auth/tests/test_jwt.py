@@ -5,10 +5,10 @@ from .base import BaseAuthTests
 
 
 class TestJWT(BaseAuthTests):
-    refresh_token_url = reverse('refresh-token')
-    login_url = reverse('login')
-    logout_url = reverse('logout')
-    user_detail_url = reverse('user-detail')
+    refresh_token_url = reverse('auth-refresh')
+    login_url = reverse('auth-login')
+    logout_url = reverse('auth-logout')
+    user_detail_url = reverse('auth-me')
 
     def login(self, client, user_data, use_email=False):
         data = {'password': user_data['password']}
@@ -47,7 +47,7 @@ class TestJWT(BaseAuthTests):
     def test_logout(self, user, client):
         self.login(client=client, user_data=user[1])
         resp = self.logout(client=client)
-        assert resp.status_code == 200
+        assert resp.status_code == 204
         assert not bool(resp.cookies[settings.JWT_AUTH_REFRESH_COOKIE].value)
 
     def test_user_detail_authenticated(self, client, user):
@@ -100,4 +100,4 @@ class TestJWT(BaseAuthTests):
             {'refresh': 'invalid token'},
             content_type='application/json',
         )
-        assert resp.status_code == 401
+        assert resp.status_code == 403
