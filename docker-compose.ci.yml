@@ -33,6 +33,11 @@ services:
       - POSTGRES_PORT
       - REDIS_HOST
       - REDIS_PORT
+      - MQTT_BROKER_HOST
+      - MQTT_BROKER_MANAGEMENT_PORT
+      - MQTT_BROKER_PORT
+      - MQTT_BROKER_USERNAME
+      - MQTT_BROKER_PASSWORD
     restart: unless-stopped
     depends_on: 
       - postgres

@@ -18,6 +18,11 @@ jobs:
       POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
       REDIS_HOST: ${{ secrets.REDIS_HOST }}
       REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      MQTT_BROKER_HOST: ${{ secrets.MQTT_BROKER_HOST }}
+      MQTT_BROKER_MANAGEMENT_PORT: ${{ secrets.MQTT_BROKER_MANAGEMENT_PORT }}
+      MQTT_BROKER_PORT: ${{ secrets.MQTT_BROKER_PORT }}
+      MQTT_BROKER_USERNAME: ${{ secrets.MQTT_BROKER_USERNAME }}
+      MQTT_BROKER_PASSWORD: ${{ secrets.MQTT_BROKER_PASSWORD }}
 
     steps:
     - uses: actions/checkout@v1
