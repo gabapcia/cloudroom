@@ -9,12 +9,3 @@ requests
 paho-mqtt
 daphne
 argon2-cffi
-
-# Testing Deps
-pytest-django
-pytest-cov
-faker
-
-# Optional
-ipython
-python-dotenv

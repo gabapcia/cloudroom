@@ -53,10 +53,10 @@ class TestJWT(BaseAuthTests):
     def test_user_detail_authenticated(self, client, user):
         user_data = user[1]
         self.login(client=client, user_data=user[1])
-        
+
         resp = client.get(TestJWT.user_detail_url)
         assert resp.status_code == 200
-        
+
         resp_data = resp.json()
         assert user_data['username'] == resp_data['username']
         assert user_data['first_name'] == resp_data['first_name']
@@ -78,7 +78,7 @@ class TestJWT(BaseAuthTests):
         resp_data = resp.json()
         assert 'access' in resp_data
         assert bool(resp_data['access'])
-    
+
     def test_refresh_token_with_body(self, client, user):
         token = self.login(client=client, user_data=user[1]).json()['refresh']
 

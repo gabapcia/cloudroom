@@ -37,7 +37,7 @@ services:
   celery_worker:
     build:
       context: .
-      target: base
+      target: celery-worker
     container_name: celery_worker
     volumes: 
       - ./:/opt/app
@@ -45,14 +45,13 @@ services:
       - media_files:/opt/app/media
     env_file: ./.env
     restart: unless-stopped
-    command: [celery, -A, cloudroom, worker, -l, INFO]
     depends_on: 
       - postgres
       - redis
   celery_beat:
     build:
       context: .
-      target: base
+      target: celery-beat
     container_name: celery_beat
     volumes: 
       - ./:/opt/app
@@ -60,7 +59,6 @@ services:
       - media_files:/opt/app/media
     env_file: ./.env
     restart: unless-stopped
-    command: [celery, -A, cloudroom, beat, -l, INFO]
     depends_on: 
       - postgres
       - redis

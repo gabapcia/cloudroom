@@ -2,7 +2,6 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import gettext_lazy as _
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -92,7 +91,7 @@ class AuthViewSet(GenericViewSet):
         data = dict(request.data)
 
         refresh_data = data.get('refresh')
-        if refresh_data and isinstance(refresh_data, list): # API View Behavior
+        if refresh_data and isinstance(refresh_data, list):  # API View Behavior
             refresh_data = list(filter(lambda c: bool(c), refresh_data))
             if refresh_data:
                 data['refresh'] = refresh_data

@@ -1,15 +1,17 @@
-import pytest
 from django.urls import reverse
 from .base import BaseMicrocontrollerTest
 
 
 class TestPins(BaseMicrocontrollerTest):
-    list_url = lambda: reverse('pin-list')
-    detail_url = lambda pk: reverse('pin-detail', kwargs={'pk': pk})
+    def _list_url() -> str:
+        return reverse('pin-list')
+
+    def _detail_url(pk: int) -> str:
+        return reverse('pin-detail', kwargs={'pk': pk})
 
     def test_unauthenticated_access(self, client, pin, pin_data):
-        list_url = TestPins.list_url()
-        detail_url = TestPins.detail_url(pk=pin[0].pk)
+        list_url = TestPins._list_url()
+        detail_url = TestPins._detail_url(pk=pin[0].pk)
 
         resp = client.get(list_url)
         assert resp.status_code == 403
@@ -38,7 +40,7 @@ class TestPins(BaseMicrocontrollerTest):
         assert resp.status_code == 403
 
     def test_authenticated_access(self, admin_client, pin_data):
-        list_url = TestPins.list_url()
+        list_url = TestPins._list_url()
 
         resp = admin_client.get(list_url)
         assert resp.status_code == 200
@@ -48,7 +50,7 @@ class TestPins(BaseMicrocontrollerTest):
         resp = admin_client.post(list_url, data)
         assert resp.status_code == 201
 
-        detail_url = TestPins.detail_url(pk=resp.json()['id'])
+        detail_url = TestPins._detail_url(pk=resp.json()['id'])
 
         resp = admin_client.get(detail_url)
         assert resp.status_code == 200
@@ -74,7 +76,7 @@ class TestPins(BaseMicrocontrollerTest):
     def test_save_pin_twice_same_board(self, admin_client, pin_data):
         data = pin_data()
 
-        list_url = TestPins.list_url()
+        list_url = TestPins._list_url()
         for _ in range(2):
             resp = admin_client.post(
                 list_url,
@@ -85,7 +87,7 @@ class TestPins(BaseMicrocontrollerTest):
 
     def test_save_pin_with_negative_number(self, pin_data, admin_client):
         data = pin_data(number=-1)
-        list_url = TestPins.list_url()
+        list_url = TestPins._list_url()
 
         resp = admin_client.post(
             list_url,
@@ -95,7 +97,7 @@ class TestPins(BaseMicrocontrollerTest):
         assert resp.status_code == 400
 
     def test_invalid_value_for_digital_pin(self, pin_data, admin_client):
-        list_url = TestPins.list_url()
+        list_url = TestPins._list_url()
 
         resp = admin_client.post(
             list_url,
@@ -105,7 +107,7 @@ class TestPins(BaseMicrocontrollerTest):
         assert resp.status_code == 400
 
     def test_invalid_value_for_a_non_digital_pin(self, pin_data, admin_client):
-        list_url = TestPins.list_url()
+        list_url = TestPins._list_url()
 
         resp = admin_client.post(
             list_url,
@@ -115,7 +117,7 @@ class TestPins(BaseMicrocontrollerTest):
         assert resp.status_code == 400
 
     def test_pin_with_invalid_board(self, admin_client, pin_data):
-        list_url = TestPins.list_url()
+        list_url = TestPins._list_url()
         data = pin_data(board='invalid board')
 
         resp = admin_client.post(
@@ -126,7 +128,7 @@ class TestPins(BaseMicrocontrollerTest):
         assert resp.status_code == 400
 
     def test_pin_without_board(self, admin_client, pin_data):
-        list_url = TestPins.list_url()
+        list_url = TestPins._list_url()
         data = pin_data(board=None)
 
         resp = admin_client.post(
@@ -140,7 +142,7 @@ class TestPins(BaseMicrocontrollerTest):
         pk = pin[0].pk
         number = pin[0].number
 
-        detail_url = TestPins.detail_url(pk=pk)
+        detail_url = TestPins._detail_url(pk=pk)
         data = admin_client.get(
             detail_url,
             content_type='application/json'
@@ -167,7 +169,7 @@ class TestPins(BaseMicrocontrollerTest):
         pk = pin[0].pk
         board = pin[0].board.pk
 
-        detail_url = TestPins.detail_url(pk=pk)
+        detail_url = TestPins._detail_url(pk=pk)
         data = admin_client.get(
             detail_url,
             content_type='application/json'
@@ -197,7 +199,7 @@ class TestPins(BaseMicrocontrollerTest):
         else:
             value = ''.join(reversed(pin[0].value))
 
-        detail_url = TestPins.detail_url(pk=pk)
+        detail_url = TestPins._detail_url(pk=pk)
         data = admin_client.get(
             detail_url,
             content_type='application/json'
@@ -219,7 +221,7 @@ class TestPins(BaseMicrocontrollerTest):
         assert resp.status_code == 400
 
     def test_change_pin_type_without_value(self, admin_client, pin):
-        detail_url = TestPins.detail_url(pk=pin[0].pk)
+        detail_url = TestPins._detail_url(pk=pin[0].pk)
         data = admin_client.get(
             detail_url,
             content_type='application/json'
@@ -241,7 +243,7 @@ class TestPins(BaseMicrocontrollerTest):
         assert resp.status_code == 400
 
     def test_create_pin_with_value_gt_1023(self, admin_client, pin_data):
-        list_url = TestPins.list_url()
+        list_url = TestPins._list_url()
 
         resp = admin_client.post(
             list_url,
@@ -251,7 +253,7 @@ class TestPins(BaseMicrocontrollerTest):
         assert resp.status_code == 400
 
     def test_update_pin_with_value_gt_1023(self, admin_client, pin):
-        detail_url = TestPins.detail_url(pk=pin[0].pk)
+        detail_url = TestPins._detail_url(pk=pin[0].pk)
 
         resp = admin_client.put(
             detail_url,

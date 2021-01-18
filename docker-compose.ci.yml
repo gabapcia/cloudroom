@@ -20,7 +20,7 @@ services:
   django:
     build:
       context: .
-      target: django
+      target: ci-django
     container_name: django
     environment:
       - DJANGO_SECRET

@@ -1,0 +1,6 @@
+-r requirements.txt
+
+pytest-django
+pytest-cov
+faker
+flake8

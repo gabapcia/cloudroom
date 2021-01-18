@@ -43,7 +43,7 @@ class CreateBoardSerializer(BaseSerializer):
         self.secret = self.generate_secret()
         data = dict(**validated_data, secret=self.secret)
         return Board.objects.create(**data)
-    
+
     def to_representation(self, instance):
         data = {
             'id': instance.pk,

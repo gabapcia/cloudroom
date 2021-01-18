@@ -29,9 +29,9 @@ class BaseAuthTests(ABC):
             }
             data.update(override)
             return data
-        
+
         return generate_user
-    
+
     @pytest.fixture
     def user(self, db, user_data):
         data = user_data()

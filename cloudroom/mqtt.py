@@ -26,7 +26,7 @@ class Manager:
     def grant_user_permissions(self, username: str) -> None:
         r = requests.put(
             f'{self._url}/permissions/%2F/{username}',
-            json={'configure': '', 'write': '.*','read': '.*'},
+            json={'configure': '', 'write': '.*', 'read': '.*'},
             auth=self._authorization,
         )
         if not r.ok:
