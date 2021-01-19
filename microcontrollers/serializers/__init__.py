@@ -1,4 +1,4 @@
-from .pin import PinSerializer, UpdatePinSerializer
+from .pin import PinSerializer, UpdatePinSerializer, BasicPinInfoSerializer
 from .board import (
     BoardSerializer,
     CreateBoardSerializer,

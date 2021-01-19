@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
@@ -11,21 +11,27 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings as jwt_stgs
-from .serializers import JWTSerializer, LoginSerializer, UserDetailsSerializer
+from .serializers import (
+    JWTSerializer,
+    LoginSerializer,
+    LogoutSerializer,
+    UserDetailsSerializer,
+)
 
 
 class AuthViewSet(GenericViewSet):
     queryset = get_user_model().objects.none()
 
-    def get_serializer_class(self):
-        return {
+    def get_serializer_class(self):  # pragma: no cover
+        serializers = {
             'me': UserDetailsSerializer,
             'login': LoginSerializer,
             'refresh': TokenRefreshSerializer,
-            'logout': None,
-        }.get(self.action)
+            'logout': LogoutSerializer,
+        }
+        return serializers.get(self.action)
 
-    @action(methods=['GET'], detail=False, permission_classes=[IsAuthenticated])
+    @action(methods=['GET'], detail=False)
     def me(self, request):
         user = request.user
         data = UserDetailsSerializer(
@@ -34,11 +40,7 @@ class AuthViewSet(GenericViewSet):
         ).data
         return Response(data)
 
-    @action(
-        methods=['POST'],
-        detail=False,
-        permission_classes=[IsAuthenticated],
-    )
+    @action(methods=['POST'], detail=False)
     def logout(self, request):
         try:
             request.user.auth_token.delete()
@@ -89,12 +91,6 @@ class AuthViewSet(GenericViewSet):
     @action(methods=['POST'], detail=False, permission_classes=[AllowAny])
     def refresh(self, request):
         data = dict(request.data)
-
-        refresh_data = data.get('refresh')
-        if refresh_data and isinstance(refresh_data, list):  # API View Behavior
-            refresh_data = list(filter(lambda c: bool(c), refresh_data))
-            if refresh_data:
-                data['refresh'] = refresh_data
 
         if not data.get('refresh'):
             refresh_cookie_name = settings.JWT_AUTH_REFRESH_COOKIE

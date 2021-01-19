@@ -41,3 +41,15 @@ class BaseAuthTests(ABC):
 
         with suppress(TransactionManagementError):
             user.delete()
+
+    @pytest.fixture
+    def inactive_user(self, db, user_data):
+        data = user_data()
+        user = get_user_model().objects.create_user(**data)
+        user.is_active = False
+        user.save()
+
+        yield user, data
+
+        with suppress(TransactionManagementError):
+            user.delete()

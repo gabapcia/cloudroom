@@ -48,8 +48,11 @@ class BoardViewSet(ModelViewSet):
     @action(methods=['GET'], detail=True)
     def pins(self, request, pk):
         board = self.get_object()
-        data = [pin.basic_info() for pin in board.pin_set.all()]
-        return Response(data)
+        serializer = serializers.BasicPinInfoSerializer(
+            board.pin_set.all(),
+            many=True,
+        )
+        return Response(serializer.data)
 
 
 class PinViewSet(ModelViewSet):

@@ -1,3 +1,4 @@
+import pytest
 from django.urls import reverse
 from .base import BaseMicrocontrollerTest
 
@@ -67,7 +68,6 @@ class TestPins(BaseMicrocontrollerTest):
             {'is_digital': False, 'value': '255'},
             content_type='application/json',
         )
-        print(resp.json())
         assert resp.status_code == 200
 
         resp = admin_client.delete(detail_url)
@@ -96,22 +96,29 @@ class TestPins(BaseMicrocontrollerTest):
         )
         assert resp.status_code == 400
 
-    def test_invalid_value_for_digital_pin(self, pin_data, admin_client):
+    @pytest.mark.parametrize('value', ['123', 'ABC'])
+    def test_invalid_value_for_digital_pin(self, pin_data, admin_client, value):
         list_url = TestPins._list_url()
 
         resp = admin_client.post(
             list_url,
-            pin_data(is_digital=True, value='123'),
+            pin_data(is_digital=True, value=value),
             content_type='application/json',
         )
         assert resp.status_code == 400
 
-    def test_invalid_value_for_a_non_digital_pin(self, pin_data, admin_client):
+    @pytest.mark.parametrize('value', ['ON', '1025'])
+    def test_invalid_value_for_a_non_digital_pin(
+        self,
+        pin_data,
+        admin_client,
+        value,
+    ):
         list_url = TestPins._list_url()
 
         resp = admin_client.post(
             list_url,
-            pin_data(is_digital=False, value='ON'),
+            pin_data(is_digital=False, value=value),
             content_type='application/json',
         )
         assert resp.status_code == 400
@@ -194,10 +201,7 @@ class TestPins(BaseMicrocontrollerTest):
 
     def test_change_pin_value_without_type(self, admin_client, pin):
         pk = pin[0].pk
-        if pin[0].is_digital:
-            value = 'OFF' if pin[0].value == 'ON' else 'ON'
-        else:
-            value = ''.join(reversed(pin[0].value))
+        value = 'OFF' if pin[0].value == 'ON' else 'ON'
 
         detail_url = TestPins._detail_url(pk=pk)
         data = admin_client.get(

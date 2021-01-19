@@ -25,7 +25,7 @@ class Board(models.Model):
         ph = PasswordHasher()
         try:
             hash = ph.hash(secret)
-        except HashingError as e:
+        except HashingError as e:  # pragma: no cover
             raise HashSecretError from e
 
         return hash
@@ -37,7 +37,7 @@ class Board(models.Model):
         except VerifyMismatchError:
             return False
 
-        if ph.check_needs_rehash(self.secret):
+        if ph.check_needs_rehash(self.secret):  # pragma: no cover
             self.secret = self._hash_secret(secret=secret)
             self.save()
 
@@ -54,7 +54,7 @@ class Board(models.Model):
 
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return f'Board ID: #{self.pk} - {self.name}'
 
     class Meta:
@@ -75,13 +75,6 @@ class Pin(models.Model):
     value = models.CharField(max_length=4, validators=[validate_pin_value])
     is_digital = models.BooleanField(default=True)
     description = models.CharField(max_length=512, null=True, blank=True)
-
-    def basic_info(self) -> dict:
-        return {
-            'number': self.number,
-            'value': self.value,
-            'is_digital': self.is_digital,
-        }
 
     class Meta:
         indexes = [

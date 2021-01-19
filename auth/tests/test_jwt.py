@@ -39,9 +39,34 @@ class TestJWT(BaseAuthTests):
         assert 'refresh' in resp_data
         assert 'user' in resp_data
 
-    def test_login_without_credentials(self, user, client):
+    def test_login_without_credentials(self, client):
         login_url = TestJWT.login_url
         resp = client.post(login_url, {}, content_type='application/json')
+        assert resp.status_code == 400
+
+    @pytest.mark.parametrize('use_email', [True, False])
+    def test_login_with_invalid_user(self, db, client, use_email):
+        user_data = {
+            'username': 'invalid username',
+            'email': 'invalid email',
+            'password': 'invalid password',
+        }
+        resp = self.login(client, user_data, use_email)
+        assert resp.status_code == 400
+
+    @pytest.mark.parametrize('use_email', [True, False])
+    def test_login_with_empty_credentials(self, db, client, use_email):
+        user_data = {
+            'username': '',
+            'email': '',
+            'password': 'invalid password',
+        }
+        resp = self.login(client, user_data, use_email)
+        assert resp.status_code == 400
+
+    @pytest.mark.parametrize('use_email', [True, False])
+    def test_login_with_inactive_user(self, client, inactive_user, use_email):
+        resp = self.login(client, inactive_user[1], use_email)
         assert resp.status_code == 400
 
     def test_logout(self, user, client):

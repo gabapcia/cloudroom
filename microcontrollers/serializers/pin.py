@@ -20,9 +20,6 @@ class PinSerializer(ModelSerializer):
             else:
                 if not re.search(r'^\d{1,4}$', data['value']):
                     raise ValidationError('Invalid value for a non digital pin')
-                elif int(data['value']) > 1023 or int(data['value']) < 0:
-                    m = 'Pin value must be between 0 and 1023'
-                    raise ValidationError(m)
 
         return data
 
@@ -35,6 +32,12 @@ class PinSerializer(ModelSerializer):
                 fields=['number', 'board'],
             )
         ]
+
+
+class BasicPinInfoSerializer(ModelSerializer):
+    class Meta:
+        model = Pin
+        fields = ['number', 'value', 'is_digital']
 
 
 class UpdatePinSerializer(PinSerializer):
