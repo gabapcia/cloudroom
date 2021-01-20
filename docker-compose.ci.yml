@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: test
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test
+    expose:
+      - 5432
   rabbitmq:
     build:
       context: rabbitmq
