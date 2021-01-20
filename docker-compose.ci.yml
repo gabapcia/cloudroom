@@ -16,8 +16,8 @@ services:
     hostname: cr-broker
     restart: unless-stopped
     environment:
-      RABBITMQ_DEFAULT_USER: test
-      RABBITMQ_DEFAULT_PASS: test
+      RABBITMQ_DEFAULT_USER: crtest
+      RABBITMQ_DEFAULT_PASS: crtest
   django:
     build:
       context: .
@@ -34,13 +34,13 @@ services:
       POSTGRES_PORT: "5432"
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: "5672"
-      RABBITMQ_USER: test
-      RABBITMQ_PASS: test
+      RABBITMQ_USER: crtest
+      RABBITMQ_PASS: crtest
       MQTT_BROKER_HOST: rabbitmq
       MQTT_BROKER_MANAGEMENT_PORT: "15672"
       MQTT_BROKER_PORT: "1883"
-      MQTT_BROKER_USERNAME: test
-      MQTT_BROKER_PASSWORD: test
+      MQTT_BROKER_USERNAME: crtest
+      MQTT_BROKER_PASSWORD: crtest
     restart: unless-stopped
     volumes:
       - ./:/opt/app
