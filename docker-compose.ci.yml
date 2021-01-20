@@ -6,11 +6,9 @@ services:
     container_name: postgres
     restart: unless-stopped
     environment:
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-    expose:
-      - 5432
+      POSTGRES_DB: test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
   rabbitmq:
     build:
       context: rabbitmq
@@ -18,31 +16,31 @@ services:
     hostname: cr-broker
     restart: unless-stopped
     environment:
-      - RABBITMQ_DEFAULT_USER
-      - RABBITMQ_DEFAULT_PASS
+      RABBITMQ_DEFAULT_USER: test
+      RABBITMQ_DEFAULT_PASS: test
   django:
     build:
       context: .
       target: ci-django
     container_name: django
     environment:
-      - DJANGO_SECRET
-      - DJANGO_DEBUG
-      - DJANGO_ALLOWED_HOSTS
-      - POSTGRES_DB
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_HOST
-      - POSTGRES_PORT
-      - RABBITMQ_HOST
-      - RABBITMQ_PORT
-      - RABBITMQ_USER
-      - RABBITMQ_PASS
-      - MQTT_BROKER_HOST
-      - MQTT_BROKER_MANAGEMENT_PORT
-      - MQTT_BROKER_PORT
-      - MQTT_BROKER_USERNAME
-      - MQTT_BROKER_PASSWORD
+      DJANGO_SECRET: secret
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      POSTGRES_DB: test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: "5672"
+      RABBITMQ_USER: test
+      RABBITMQ_PASS: test
+      MQTT_BROKER_HOST: rabbitmq
+      MQTT_BROKER_MANAGEMENT_PORT: "15672"
+      MQTT_BROKER_PORT: "1883"
+      MQTT_BROKER_USERNAME: test
+      MQTT_BROKER_PASSWORD: test
     restart: unless-stopped
     volumes:
       - ./:/opt/app

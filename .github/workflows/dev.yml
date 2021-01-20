@@ -23,23 +23,6 @@ jobs:
   pytest:
     runs-on: ubuntu-latest
     needs: [lint]
-    env:
-      DJANGO_SECRET: ${{ secrets.DJANGO_SECRET }}
-      DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
-      DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
-      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-      POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
-      REDIS_HOST: ${{ secrets.REDIS_HOST }}
-      REDIS_PORT: ${{ secrets.REDIS_PORT }}
-      MQTT_BROKER_HOST: ${{ secrets.MQTT_BROKER_HOST }}
-      MQTT_BROKER_MANAGEMENT_PORT: ${{ secrets.MQTT_BROKER_MANAGEMENT_PORT }}
-      MQTT_BROKER_PORT: ${{ secrets.MQTT_BROKER_PORT }}
-      MQTT_BROKER_USERNAME: ${{ secrets.MQTT_BROKER_USERNAME }}
-      MQTT_BROKER_PASSWORD: ${{ secrets.MQTT_BROKER_PASSWORD }}
-
     steps:
       - uses: actions/checkout@v2
       - name: Build the docker-compose stack
