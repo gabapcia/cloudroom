@@ -29,6 +29,7 @@ services:
       DJANGO_SECRET: secret
       DJANGO_DEBUG: 1
       DJANGO_ALLOWED_HOSTS: "*"
+      DATABASE: postgres
       POSTGRES_DB: crtest
       POSTGRES_USER: crtest
       POSTGRES_PASSWORD: crtest
@@ -48,3 +49,4 @@ services:
       - ./:/opt/app
     depends_on: 
       - postgres
+      - rabbitmq

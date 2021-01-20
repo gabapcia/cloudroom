@@ -29,8 +29,8 @@ jobs:
         run: docker-compose -f docker-compose.ci.yml up -d
       - name: Check running containers
         run: docker ps -a
-      - name: Check logs
-        run: docker logs django
+      - name: Wait for RabbitMQ to start
+        run: ./scripts/wait_rabbitmq_startup.sh
       - name: Run test suite
         run: docker exec django pytest --cov --cov-report xml
 
