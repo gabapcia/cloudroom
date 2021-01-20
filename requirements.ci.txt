@@ -2,5 +2,7 @@
 
 pytest-django
 pytest-cov
+pytest-order
+pytest-timeout
 faker
 flake8

@@ -1,6 +1,7 @@
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
-from django.db import models
+from django.db import models, transaction
+from cloudroom.mqtt import Manager as MQTTManager
 from .exceptions import HashSecretError
 from .validators import validate_pin_value
 
@@ -43,16 +44,28 @@ class Board(models.Model):
 
         return True
 
+    @transaction.atomic()
     def update_secret(self, secret: str) -> None:
-        secret = self._hash_secret(secret)
-        self.secret = secret
+        manager = MQTTManager()
+        manager.update_user_password(username=self.name, new_password=secret)
+        self.secret = self._hash_secret(secret)
         self.save()
 
+    @transaction.atomic()
     def save(self, *args, **kwargs):
         if not self.pk:
+            manager = MQTTManager()
+            manager.create_user(username=self.name, password=self.secret)
+            manager.grant_user_permissions(username=self.name)
             self.secret = self._hash_secret(secret=self.secret)
 
         super().save(*args, **kwargs)
+
+    @transaction.atomic()
+    def delete(self, **kwargs) -> tuple[int, dict[str, int]]:
+        manager = MQTTManager()
+        manager.delete_user(username=self.name)
+        return super().delete(**kwargs)
 
     def __str__(self):  # pragma: no cover
         return f'Board ID: #{self.pk} - {self.name}'

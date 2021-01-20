@@ -2,7 +2,9 @@ from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from cloudroom.mqtt.exceptions import BrokerRequestError
 from . import serializers
+from .exceptions import BrokerConnectionError
 from .models import Board, Pin
 
 
@@ -23,6 +25,12 @@ class BoardViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except BrokerRequestError as e:
+            raise BrokerConnectionError from e
 
     @action(methods=['POST'], detail=True, url_path='validate-secret')
     def validate_secret(self, request, pk):

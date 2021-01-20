@@ -14,9 +14,6 @@ import os
 from pathlib import Path
 
 
-REDIS_URL = f'redis://{os.environ["REDIS_HOST"]}:{os.environ["REDIS_PORT"]}'
-
-
 # MQTT Configuration
 MQTT_BROKER_HOST = os.environ['MQTT_BROKER_HOST']
 MQTT_BROKER_MANAGEMENT_PORT = os.environ['MQTT_BROKER_MANAGEMENT_PORT']
@@ -28,9 +25,15 @@ MQTT_BROKER_MANAGEMENT_URL = 'http://{host}:{port}'.format(
     port=MQTT_BROKER_MANAGEMENT_PORT,
 )
 
+RABBITMQ_URL = 'amqp://{user}:{password}@{host}:{port}'.format(
+    user=os.environ['RABBITMQ_USER'],
+    password=os.environ['RABBITMQ_PASS'],
+    host=os.environ['RABBITMQ_HOST'],
+    port=os.environ['RABBITMQ_PORT'],
+)
 
 # Celery variables
-CELERY_BROKER_URL = REDIS_URL
+CELERY_BROKER_URL = RABBITMQ_URL
 CELERY_TIMEZONE = 'America/Sao_Paulo'
 CELERY_BEAT_SCHEDULE = {}
 

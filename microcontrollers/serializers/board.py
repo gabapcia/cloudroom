@@ -2,6 +2,8 @@ import string
 import random
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from cloudroom.mqtt.exceptions import BrokerRequestError
+from ..exceptions import BrokerConnectionError
 from ..models import Board
 
 
@@ -37,12 +39,16 @@ class BoardSerializer(BaseSerializer):
 
 
 class CreateBoardSerializer(BaseSerializer):
-    SECRET_SIZE = 50
-
     def create(self, validated_data):
         self.secret = self.generate_secret()
         data = dict(**validated_data, secret=self.secret)
-        return Board.objects.create(**data)
+
+        try:
+            board = Board.objects.create(**data)
+        except BrokerRequestError as e:
+            raise BrokerConnectionError from e
+
+        return board
 
     def to_representation(self, instance):
         data = {
@@ -82,7 +88,12 @@ class SecretValidationSerializer(BaseSerializer):
 class UpdateSecretSerializer(BaseSerializer):
     def update(self, instance, validated_data):
         self.secret = self.generate_secret()
-        instance.update_secret(self.secret)
+
+        try:
+            instance.update_secret(self.secret)
+        except BrokerRequestError as e:
+            raise BrokerConnectionError from e
+
         return instance
 
     class Meta:

@@ -10,14 +10,17 @@ services:
       - postgres_data:/var/lib/postgresql/data
     expose:
       - 5432
-  redis:
-    image: redis:alpine
-    container_name: redis
+  rabbitmq:
+    build:
+      context: rabbitmq
+    container_name: rabbitmq
+    hostname: cr-broker
     restart: unless-stopped
+    env_file: ./rabbitmq/.env
     volumes: 
-      - redis_data:/data
-    expose:
-      - 6379
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - 1883:1883
   django:
     build:
       context: .
@@ -29,11 +32,11 @@ services:
       - media_files:/opt/app/media
     env_file: ./.env
     restart: unless-stopped
-    ports: 
+    ports:
       - 8000:8000
     depends_on: 
       - postgres
-      - redis
+      - rabbitmq
   celery_worker:
     build:
       context: .
@@ -47,7 +50,7 @@ services:
     restart: unless-stopped
     depends_on: 
       - postgres
-      - redis
+      - rabbitmq
   celery_beat:
     build:
       context: .
@@ -61,9 +64,9 @@ services:
     restart: unless-stopped
     depends_on: 
       - postgres
-      - redis
+      - rabbitmq
 volumes: 
   postgres_data:
-  redis_data:
+  rabbitmq_data:
   static_files:
   media_files:

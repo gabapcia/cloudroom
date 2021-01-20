@@ -4,7 +4,6 @@ django-cors-headers
 djangorestframework-simplejwt
 psycopg2-binary
 celery
-redis
 requests
 paho-mqtt
 daphne
