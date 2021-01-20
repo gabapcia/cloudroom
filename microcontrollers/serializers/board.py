@@ -45,7 +45,7 @@ class CreateBoardSerializer(BaseSerializer):
 
         try:
             board = Board.objects.create(**data)
-        except BrokerRequestError as e:
+        except BrokerRequestError as e:  # pragma: no cover
             raise BrokerConnectionError from e
 
         return board
@@ -91,7 +91,7 @@ class UpdateSecretSerializer(BaseSerializer):
 
         try:
             instance.update_secret(self.secret)
-        except BrokerRequestError as e:
+        except BrokerRequestError as e:  # pragma: no cover
             raise BrokerConnectionError from e
 
         return instance

@@ -29,7 +29,7 @@ class BoardViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         try:
             return super().destroy(request, *args, **kwargs)
-        except BrokerRequestError as e:
+        except BrokerRequestError as e:  # pragma: no cover
             raise BrokerConnectionError from e
 
     @action(methods=['POST'], detail=True, url_path='validate-secret')
