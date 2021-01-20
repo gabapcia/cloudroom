@@ -6,9 +6,9 @@ services:
     container_name: postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: test
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
+      POSTGRES_DB: crtest
+      POSTGRES_USER: crtest
+      POSTGRES_PASSWORD: crtest
     expose:
       - 5432
   rabbitmq:
@@ -27,20 +27,20 @@ services:
     container_name: django
     environment:
       DJANGO_SECRET: secret
-      DJANGO_DEBUG: "1"
+      DJANGO_DEBUG: 1
       DJANGO_ALLOWED_HOSTS: "*"
-      POSTGRES_DB: test
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
+      POSTGRES_DB: crtest
+      POSTGRES_USER: crtest
+      POSTGRES_PASSWORD: crtest
       POSTGRES_HOST: postgres
-      POSTGRES_PORT: "5432"
+      POSTGRES_PORT: 5432
       RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: "5672"
+      RABBITMQ_PORT: 5672
       RABBITMQ_USER: crtest
       RABBITMQ_PASS: crtest
       MQTT_BROKER_HOST: rabbitmq
-      MQTT_BROKER_MANAGEMENT_PORT: "15672"
-      MQTT_BROKER_PORT: "1883"
+      MQTT_BROKER_MANAGEMENT_PORT: 15672
+      MQTT_BROKER_PORT: 1883
       MQTT_BROKER_USERNAME: crtest
       MQTT_BROKER_PASSWORD: crtest
     restart: unless-stopped
