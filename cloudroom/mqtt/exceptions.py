@@ -10,6 +10,10 @@ class BrokerRequestError(Exception):
         return f'Broker returned a status code: {self.code}'
 
 
+class BrokerPublishError(Exception):
+    pass
+
+
 class InvalidUsername(Exception):
     pass
 

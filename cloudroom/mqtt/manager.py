@@ -6,7 +6,12 @@ import requests
 from django.conf import settings
 from requests.models import HTTPBasicAuth
 import paho.mqtt.publish as paho
-from .exceptions import BrokerRequestError, InvalidPassword, InvalidUsername
+from .exceptions import (
+    BrokerRequestError,
+    BrokerPublishError,
+    InvalidPassword,
+    InvalidUsername,
+)
 
 
 class Manager:
@@ -43,7 +48,7 @@ class Manager:
 
         r = requests.put(
             f'{self._url}/permissions/%2F/{username}',
-            json={'configure': '', 'write': '.*', 'read': '.*'},
+            json={'configure': '.*', 'write': '.*', 'read': '.*'},
             auth=self._authorization,
         )
         if not r.ok:
@@ -80,12 +85,15 @@ class Manager:
         payload: dict[str, Any],
         qos: int = 1,
     ) -> None:
-        paho.single(
-            topic=topic,
-            payload=json.dumps(payload),
-            qos=qos,
-            retain=True,
-            hostname=self._hostname,
-            port=self._port,
-            auth={'username': self._username, 'password': self._password},
-        )
+        try:
+            paho.single(
+                topic=topic,
+                payload=json.dumps(payload),
+                qos=qos,
+                retain=True,
+                hostname=self._hostname,
+                port=self._port,
+                auth={'username': self._username, 'password': self._password},
+            )
+        except Exception as e:  # pragma: no cover
+            raise BrokerPublishError from e
