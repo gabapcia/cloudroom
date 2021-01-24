@@ -11,7 +11,7 @@ class BaseSerializer(serializers.ModelSerializer):
     SECRET_SIZE = 50
 
     def generate_secret(self) -> str:
-        c = ''.join([string.ascii_letters, string.punctuation, string.digits])
+        c = ''.join([string.ascii_letters, string.digits])
         secret = random.choices(c, k=BaseSerializer.SECRET_SIZE)
         secret = ''.join(secret)
 

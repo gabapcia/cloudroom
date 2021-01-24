@@ -1,3 +1,4 @@
+import json
 import pytest
 from django.urls import reverse
 from .base import BaseMicrocontrollerTest
@@ -9,6 +10,9 @@ class TestPins(BaseMicrocontrollerTest):
 
     def _detail_url(pk: int) -> str:
         return reverse('pin-detail', kwargs={'pk': pk})
+
+    def _periodic_tasks_url(pk: int) -> str:
+        return reverse('pin-periodic-behaviors', kwargs={'pk': pk})
 
     def test_unauthenticated_access(self, client, pin, pin_data):
         list_url = TestPins._list_url()
@@ -147,7 +151,7 @@ class TestPins(BaseMicrocontrollerTest):
 
     def test_change_pin_number(self, admin_client, pin):
         pk = pin[0].pk
-        number = pin[0].number
+        number = pin[0].number + 1
 
         detail_url = TestPins._detail_url(pk=pk)
         data = admin_client.get(
@@ -158,7 +162,7 @@ class TestPins(BaseMicrocontrollerTest):
 
         resp = admin_client.put(
             detail_url,
-            {**data, 'number': number + 1},
+            {**data, 'number': number},
             content_type='application/json',
         )
         assert resp.status_code == 200
@@ -269,6 +273,119 @@ class TestPins(BaseMicrocontrollerTest):
         resp = admin_client.patch(
             detail_url,
             {'is_digital': False, 'value': 1024},
+            content_type='application/json',
+        )
+        assert resp.status_code == 400
+
+    def test_list_pin_periodic_tasks(self, admin_client, pin):
+        pin = pin[0]
+        periodic_tasks_url = TestPins._periodic_tasks_url(pk=pin.pk)
+        resp = admin_client.get(periodic_tasks_url)
+        assert resp.status_code == 200
+
+    def test_create_periodic_task(self, admin_client, pin):
+        pin = pin[0]
+        data = {
+            'task': {
+                'name': 'test',
+                'task': 'microcontrollers.tasks.change_pin_value',
+                'kwargs': json.dumps({
+                    'pin_id': pin.pk,
+                    'value': 'OFF' if pin.value == 'ON' else 'ON',
+                }),
+                'enabled': True,
+                'crontab': {}
+            }
+        }
+        periodic_tasks_url = TestPins._periodic_tasks_url(pk=pin.pk)
+
+        resp = admin_client.post(
+            periodic_tasks_url,
+            data,
+            content_type='application/json',
+        )
+        assert resp.status_code == 201
+
+    def test_create_periodic_task_with_invalid_kwargs(self, admin_client, pin):
+        pin = pin[0]
+        data = {
+            'task': {
+                'name': 'test',
+                'task': 'microcontrollers.tasks.change_pin_value',
+                'kwargs': 'invalid kwargs',
+                'enabled': True,
+                'crontab': {}
+            }
+        }
+        periodic_tasks_url = TestPins._periodic_tasks_url(pk=pin.pk)
+
+        resp = admin_client.post(
+            periodic_tasks_url,
+            data,
+            content_type='application/json',
+        )
+        assert resp.status_code == 400
+
+    def test_create_periodic_task_without_kwargs(self, admin_client, pin):
+        pin = pin[0]
+        data = {
+            'task': {
+                'name': 'test',
+                'task': 'microcontrollers.tasks.change_pin_value',
+                'enabled': True,
+                'crontab': {}
+            }
+        }
+        periodic_tasks_url = TestPins._periodic_tasks_url(pk=pin.pk)
+
+        resp = admin_client.post(
+            periodic_tasks_url,
+            data,
+            content_type='application/json',
+        )
+        assert resp.status_code == 400
+
+    def test_create_periodic_task_without_task(self, admin_client, pin):
+        pin = pin[0]
+        data = {
+            'task': {
+                'name': 'test',
+                'kwargs': json.dumps({
+                    'pin_id': pin.pk,
+                    'value': 'OFF' if pin.value == 'ON' else 'ON',
+                }),
+                'enabled': True,
+                'crontab': {}
+            }
+        }
+        periodic_tasks_url = TestPins._periodic_tasks_url(pk=pin.pk)
+
+        resp = admin_client.post(
+            periodic_tasks_url,
+            data,
+            content_type='application/json',
+        )
+        assert resp.status_code == 400
+
+    def test_create_periodic_task_with_wrong_arg_type(self, admin_client, pin):
+        pin = pin[0]
+        data = {
+            'task': {
+                'name': 'test',
+                'task': 'microcontrollers.tasks.change_pin_value',
+                'kwargs': json.dumps({
+                    'pin_id': pin.pk,
+                    'value': 123,
+                }),
+                'enabled': True,
+                'crontab': {}
+            }
+        }
+        periodic_tasks_url = TestPins._periodic_tasks_url(pk=pin.pk)
+
+        resp = admin_client.post(
+            periodic_tasks_url,
+            data,
             content_type='application/json',
         )
         assert resp.status_code == 400

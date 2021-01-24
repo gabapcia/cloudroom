@@ -1,9 +1,11 @@
+import json
 from abc import ABC
 from contextlib import suppress
 from random import shuffle
 import pytest
 from django.db.transaction import TransactionManagementError
 from ..models import Board, Pin
+from ..serializers.periodic_behavior import CreatePeriodicPinBehaviorSerializer
 
 
 class BaseMicrocontrollerTest(ABC):
@@ -63,3 +65,36 @@ class BaseMicrocontrollerTest(ABC):
 
         with suppress(TransactionManagementError):
             pin.delete()
+
+    @pytest.fixture
+    def periodic_pin_data(self, faker, pin):
+        def generate_data(task: str = '', **kwargs):
+            task = task or 'microcontrollers.tasks.change_pin_value'
+            kwargs = kwargs or {'pin_id': pin[0].pk, 'value': 'ON'}
+            data = {
+                'pin': pin[0].pk,
+                'task': {
+                    'name': 'test',
+                    'task': task,
+                    'kwargs': json.dumps(kwargs),
+                    'enabled': True,
+                    'crontab': {}
+                }
+            }
+            return data
+
+        return generate_data
+
+    @pytest.fixture
+    def periodic_pin(self, db, periodic_pin_data):
+        data = periodic_pin_data()
+        serializer = CreatePeriodicPinBehaviorSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        periodic_pin = serializer.instance
+
+        yield periodic_pin, data
+
+        with suppress(TransactionManagementError):
+            periodic_pin.delete()

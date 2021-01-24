@@ -1,9 +1,11 @@
 from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
 from django.db import models, transaction
+from django_celery_beat.models import PeriodicTask
 from cloudroom.mqtt import Manager as MQTTManager
 from .exceptions import HashSecretError
 from .validators import validate_pin_value
+from .utils import build_topic
 
 
 class Board(models.Model):
@@ -68,7 +70,7 @@ class Board(models.Model):
         return super().delete(**kwargs)
 
     def __str__(self):  # pragma: no cover
-        return f'Board ID: #{self.pk} - {self.name}'
+        return f'Board #{self.pk} - "{self.name}"'
 
     class Meta:
         indexes = [
@@ -88,6 +90,20 @@ class Pin(models.Model):
     value = models.CharField(max_length=4, validators=[validate_pin_value])
     is_digital = models.BooleanField(default=True)
     description = models.CharField(max_length=512, null=True, blank=True)
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f'Pin #{self.number} - "{self.name}"; from {self.board}'
+
+    @transaction.atomic()
+    def save(self, *args, **kwargs) -> None:
+        from .tasks import notify_board
+
+        topic = build_topic(board_id=self.board.pk)
+        transaction.on_commit(lambda: notify_board.delay(
+            topic=topic,
+            pin_id=self.pk,
+        ))
+        return super().save(*args, **kwargs)
 
     class Meta:
         indexes = [
@@ -113,4 +129,23 @@ class Pin(models.Model):
                 ),
                 name='Check pin value by type',
             ),
+        ]
+
+
+class PeriodicPinBehavior(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    task = models.ForeignKey(PeriodicTask, on_delete=models.CASCADE)
+    pin = models.ForeignKey(Pin, on_delete=models.CASCADE)
+
+    @transaction.atomic()
+    def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
+        self.task.delete()
+        return super().delete(*args, **kwargs)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['created']),
+            models.Index(fields=['updated']),
         ]
