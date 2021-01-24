@@ -1,5 +1,6 @@
 django
-djangorestframework
+django-rest-framework
+django-celery-beat
 django-cors-headers
 djangorestframework-simplejwt
 psycopg2-binary

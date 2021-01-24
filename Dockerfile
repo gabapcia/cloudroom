@@ -13,11 +13,11 @@ RUN pip install -Ur requirements.txt
 COPY . .
 
 
-FROM base AS celery-worker
-CMD ["celery", "-A", "cloudroom", "beat", "-l", "INFO"]
-
-
 FROM base AS celery-beat
+CMD ["celery", "-A", "cloudroom", "beat", "-l", "INFO", "-S", "django"]
+
+
+FROM base AS celery-worker
 CMD ["celery", "-A", "cloudroom", "worker", "-l", "INFO"]
 
 
