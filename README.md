@@ -6,18 +6,22 @@
 CloudRoom is an Internet of Things project focused on home automation and customization.
 
 ## Features
+
 - Real time microcontroller notification;
 - REST API to manage your microcontrollers;
+- Set up tasks to manage the microcontroller pins state;
 
 ## Installation
+
 - Docker-Compose
+
 ```shell
-$ git clone https://github.com/GabrielBG99/cloudroom
-$ cd cloudroom
-$ docker-compose up -d
+git clone https://github.com/GabrielBG99/cloudroom
+cd cloudroom
+docker-compose up -d
 ```
 
 ## TODO
+
 - Improve documentation;
-- Cron job for updating pin status;
 - Accept messages from registered microcontrollers;
