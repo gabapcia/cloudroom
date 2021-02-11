@@ -33,5 +33,4 @@ jobs:
           file: ./Dockerfile.hub
           platforms: linux/amd64,linux/arm64
           push: true
-          target: django
           tags: gabrielbg99/cloudroom:${{ env.RELEASE_VERSION }}
