@@ -24,7 +24,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - 
         name: Get current TAG
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        run: echo "RELEASE_VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
       - 
         name: Build and push
         uses: docker/build-push-action@v2
@@ -33,4 +33,5 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
+          target: django
           tags: gabrielbg99/cloudroom:${{ env.RELEASE_VERSION }}
