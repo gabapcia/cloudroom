@@ -1,5 +1,5 @@
 from celery import shared_task
-from cloudroom.mqtt import Manager as MQTTManager
+from cloudroom.mqtt.rabbitmq import Manager as MQTTManager
 from cloudroom.mqtt.exceptions import BrokerPublishError
 from .models import Pin
 from .serializers.pin import BasicPinInfoSerializer

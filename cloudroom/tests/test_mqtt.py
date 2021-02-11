@@ -2,7 +2,7 @@ import json
 from copy import deepcopy
 import pytest
 import paho.mqtt.subscribe as subscribe
-from ..mqtt import Manager as MQTTManager
+from ..mqtt.rabbitmq import Manager as MQTTManager
 from ..mqtt.exceptions import (
     BrokerRequestError,
     InvalidPassword,

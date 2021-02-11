@@ -1,7 +1,7 @@
 import json
 import pytest
 import paho.mqtt.subscribe as subscribe
-from cloudroom.mqtt import Manager as MQTTManager
+from cloudroom.mqtt.rabbitmq import Manager as MQTTManager
 from .base import BaseMicrocontrollerTest
 from ..utils import build_topic
 from ..tasks import notify_board, change_pin_value

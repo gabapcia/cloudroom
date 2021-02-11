@@ -2,7 +2,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import HashingError, VerifyMismatchError
 from django.db import models, transaction
 from django_celery_beat.models import PeriodicTask
-from cloudroom.mqtt import Manager as MQTTManager
+from cloudroom.mqtt.rabbitmq import Manager as MQTTManager
 from .exceptions import HashSecretError
 from .validators import validate_pin_value
 from .utils import build_topic
